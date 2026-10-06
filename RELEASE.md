@@ -149,10 +149,17 @@ This is the part reviewers and readers care about. Paste, into the Zenodo
 **description** field, the measured table from the white paper §4.2 — including
 the device name, the qubit count, the shot count and the date:
 
-> Measured on `ibm_marrakesh`, a 156-qubit superconducting QPU, 2000 shots per
-> run, 2026-10-06. Bell balance 99.3% (run 1), 98.8% (run 2), 97.3% (after
-> refactor). GHZ `000` = 49.20%, `111` = 47.60%, noise 1.80%. Measurement floor
+> Measured on `ibm_marrakesh`, a 156-qubit superconducting QPU, 2000–4000 shots
+> per run, 2026-10-06. Bell balance across **seven independent runs**:
+> 87.7% / 89.0% / 91.7% / 94.9% / 97.3% / 98.8% / 99.3% — worst, median 94.9%,
+> best. GHZ `000`/`111` balance 96.7% and 89.3% in two runs. Measurement floor
 > from the `|0⟩` reference: 98.25% / 98.70% / 97.40% at 1 / 2 / 3 qubits.
+>
+> **State the spread, not just the best run.** The 99.3% figure is the best of
+> seven; the characteristic value is ~92–95%. The bridge is proven to work (the
+> `00`/`11` branch dominates in every run), but the decode is a good
+> approximation, not an exact inversion. Reviewers who run it themselves will
+> see the spread, and a headline claim of 99.3% would read as an overstatement.
 
 ### 4.5 Publish → mint the DOI
 

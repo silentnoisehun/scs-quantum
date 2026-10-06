@@ -4,7 +4,11 @@ Frekvencialapú hullámcsomag-kódolás, **valódi kvantumhardveren igazolt** kv
 
 > 🧬 **A rendszer 2 és 3 qubites kvantumhídja hardveresen bizonyított.**
 > Valódi 156 qubites szupravezető QPU-n mérve: a Bell-állapot egyensúlya
-> **99,3%**, a GHZ ideális (2000 shots, IBM `ibm_marrakesh`, 2026.10.06).
+> **87,7–99,3%** hét független futásból, **jellemzően ~92–95%**
+> (IBM `ibm_marrakesh`, 2026.10.06).
+>
+> ⚠️ A híd **működik**, de a minősége nem 99%: a visszafejtés
+> jól közelít, nem egzakt. Lásd [Korlátok](#korlátok--amit-a-rendszer-nem-bizonyít).
 
 **English:** [README in English](README.en.md) ·
 **Dokumentumok:** [White Paper (HU)](docs/SCS_WHITE_PAPER.md) ·
@@ -52,7 +56,7 @@ python -m python.tkr_ibm bell --backend ibm_marrakesh --shots 2000
 
 ## A mért hardveres eredmények
 
-`ibm_marrakesh`, 156 qubit, valódi szupravezető QPU, 2000 shots/db.
+`ibm_marrakesh`, 156 qubit, valódi szupravezető QPU, 2000–4000 shots/db.
 
 | Áramkör | Mért | Egyensúly |
 |---|---|---|
@@ -60,15 +64,39 @@ python -m python.tkr_ibm bell --backend ibm_marrakesh --shots 2000
 | `zero --qubits 2` | `0x0` = 98,70% | mérési alap |
 | `zero --qubits 3` | `0x0` = 97,40% | mérési alap |
 | `h` | `00` = 50,55%, `01` = 49,35% | 50/50 kontroll |
-| **`bell`** | `00` = 49,35%, `11` = 49,00% | **99,3%** |
-| `bell` (2. futás) | `00` = 48,50%, `11` = 47,90% | **98,8%** |
-| `bell` (refaktor után) | `00` = 49,30%, `11` = 47,95% | **97,3%** |
-| **`ghz`** | `000` = 49,20%, `111` = 47,60% | ideális, zaj 1,80% |
 
-A Bell zaj (01+10) = 1,65% — normális 2 qubites szupravezető QPU-nál.
+### Bell — mind a hét futás, nem csak a legjobb
+
+| Futás | `00` | `11` | Egyensúly | Shots |
+|---|---|---|---|---|
+| 1. | 49,35% | 49,00% | 99,3% | 2000 |
+| 2. | 48,50% | 47,90% | 98,8% | 2000 |
+| 3. (refaktor után) | 49,30% | 47,95% | 97,3% | 2000 |
+| 4. | 50,05% | 44,52% | 89,0% | 2000 |
+| 5. | 50,55% | 46,35% | 91,7% | 4000 |
+| 6. | 49,75% | 47,20% | 94,9% | 4000 |
+| 7. | 51,33% | 45,02% | 87,7% | 4000 |
+
+**legrosszabb 87,7% · jellemző (medián) 94,9% · legjobb 99,3%**
+
+### GHZ
+
+| Futás | `000` | `111` | Egyensúly |
+|---|---|---|---|
+| korábbi | 49,20% | 47,60% | 96,7% |
+| későbbi | 50,80% | 44,60% | 89,3% |
+
+🧬 **Miért publikálunk mind a hét futást?** Mert a 99,3% a legjobb
+megfigyelt érték, nem a jellemző. Ha csak a legjobbat írjuk ki, a
+rendszer sokkal jobbnak látszik, mint amit a mérés indokol — és pont
+ezt a hibát követte el az a naiv bizonyítás, amely egyetlen sikeres
+mérésből általánosít. A híd **működik** (minden futásban a 00/11 ág
+dominál), de a minősége nem 99%.
 
 **Ebből következik**, hogy a dekódolási képletek `P(q0=1) = sin²(θ/2)`
-feltevése nem feltételezés, hanem méréssel igazolt állítás.
+feltevése nem feltételezés, hanem méréssel igazolt állítás — de a
+mérési bizonytalanság (87,7–99,3%) miatt a **visszafejtett érték
+pontosságára** külön becslés szükséges.
 
 ## 🧬 Két bizonyítási szint — ne keverd össze őket
 
@@ -158,6 +186,13 @@ mérés **elutasításra kerül**.
 
 ## Korlátok — amit a rendszer NEM bizonyít
 
+- **A visszafejtés nem egzakt.** A híd működik, de a Bell-egyensúly
+  futásonként 87,7–99,3% (jellemzően ~92–95%) közé esik. Ezért a
+  visszafejtett `A`, `f`, `φ` **jól közelít, de nem adja vissza az
+  eredeti értéket pontosan**. Pontos értékhez hibajavító
+  (error mitigation), jobb kvantumpár-kiválasztás vagy több lőés kell.
+  A korábbi dokumentáció a 99,3%-os (legjobb) futást kezelte jellemző
+  értékként — ez túlzás volt.
 - **Az `O(1)` kvantum-rezonancia routing feltételezés.** Nincs
   komplexitásmérés, és egy 2 qubitemes kódolás önmagában nem ad
   kvantum-előnyt — egy klasszikus számítás is elvégzi ugyanezt.

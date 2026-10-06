@@ -5,16 +5,23 @@ SCS — IBM Quantum backend (Qiskit Runtime).
 Az SCS referencia-áramköreit valódi szupravezető QPU-n futtatja, és
 mért bizonyítékot ad a hardveres validációhoz.
 
-MÉRT EREDMÉNYEK (2026.10.06, IBM `ibm_marrakesh`, 156 qubit, 2000 shots):
+MÉRT EREDMÉNYEK (2026.10.06, IBM `ibm_marrakesh`, 156 qubit, 2000–4000 shots):
     zero ×1   → 0x0 = 98,25%
-    zero ×2   → 0x0 = 98,70%
+    zero ×2   → 0x0 = 98,70%   (későbbi futás: 98,40%)
     zero ×3   → 0x0 = 97,40%
-    h         → 00: 50,55%  01: 49,35%          (ideális)
-    bell      → 00: 49,35%  11: 49,00%  egyensúly 99,3%   (ideális)
-    bell (2.) → 00: 48,50%  11: 47,90%  egyensúly 98,8%   (reprodukálható)
-    ghz       → 000: 49,20%  111: 47,60%        (ideális)
+    h         → 00: 50,55%  01: 49,35%          (ideális, reprodukálható)
+    bell      → HÉT FÜGGETLEN FUTÁS:
+                00/11 egyensúly 87,7% · 89,0% · 91,7% · 94,9% ·
+                97,3% · 98,8% · 99,3%
+                legrosszabb 87,7% | medián 94,9% | legjobb 99,3%
+    ghz       → 000/111 egyensúly 89,3% és 96,7%
 
 Ez a 2 ÉS 3 qubites kvantumhíd hardveres bizonyítéka.
+
+🧬 A BELL-EGYENSÚLY JELLEMŐ ÉRTÉKE ~92–95%, NEM 99,3%. A 99,3% a legjobb
+megfigyelt futás. A híd működik — minden futásban a 00/11 ág dominál —
+de a visszafejtés JÓ KÖZELÍTÉS, nem egzakt visszaállítás. A pontos
+értékhez hibajavító (error mitigation) szükséges.
 
 KÖRNYEZETI VÁLTOZÓK (a token SOHA nem kerül fájlba):
   IBM_QUANTUM_API_TOKEN  kötelező (alternatíva: QISKIT_IBM_TOKEN)
@@ -28,6 +35,9 @@ fájlba írni pontosan az ellenkezőjét állítaná annak, amit mért.
 
 import os
 import sys
+import json
+import time
+from pathlib import Path
 
 for _stream in (sys.stdout, sys.stderr):
     if hasattr(_stream, "reconfigure"):
@@ -332,6 +342,10 @@ class IbmRunner:
             print("transzpilálva: nincs (ideális, közvetlen állapotvektor)")
             job = self.backend.run([qc], shots=shots)
             counts = job.result()[0].data.c.get_counts()
+            job_id = "local_statevector"
+            backend_name = "statevector (ideális, helyi)"
+            transpiled_ops = {}
+            tq_qasm = None
         else:
             # `backend.run()` MEGSZŰNT a qiskit-ibm-runtime 0.5x-ben
             # ("Support for backend.run() has been removed"). A QPU-
@@ -340,9 +354,57 @@ class IbmRunner:
             from qiskit_ibm_runtime import SamplerV2
             tq = self._transpile(qc, self.backend, optimization_level=1,
                                  seed_transpiler=42)
-            print(f"transzpilálva: {dict(tq.count_ops())}")
+            transpiled_ops = dict(tq.count_ops())
+            print(f"transzpilálva: {transpiled_ops}")
             job = SamplerV2(mode=self.backend).run([(tq,)], shots=shots)
+            job_id = job.job_id()
+            backend_name = getattr(self.backend, "name", "unknown")
+            tq_qasm = tq.qasm() if hasattr(tq, 'qasm') else str(tq)
             counts = job.result()[0].data.c.get_counts()
+
+            # Backend tulajdonságok (kalibráció) lekérése az audit trail-hez
+            backend_props = {}
+            try:
+                props = self.backend.properties()
+                if props:
+                    backend_props = {
+                        "qubits": len(props.qubits) if hasattr(props, 'qubits') else None,
+                        "gates": [
+                            {"gate": g.gate, "qubits": g.qubits, "parameters": [
+                                {"name": p.name, "value": p.value, "unit": getattr(p, 'unit', '')}
+                                for p in g.parameters
+                            ]} for g in props.gates
+                        ] if hasattr(props, 'gates') else [],
+                        "last_update_date": str(props.last_update_date) if hasattr(props, 'last_update_date') else None,
+                    }
+            except Exception:
+                pass  # ha nem sikerül, nem szakítjuk meg a mérést
+
+        # --- NYERS ADAT MENTÉSE (audit trail) ---
+        raw_dir = Path("measurement_raw")
+        raw_dir.mkdir(exist_ok=True)
+        timestamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+        raw_file = raw_dir / f"{kind}_{n}q_{shots}s_{job_id}_{timestamp}.json"
+        raw_data = {
+            "job_id": job_id,
+            "backend": backend_name,
+            "channel": _channel() if not self.local else "local",
+            "instance": _instance() if not self.local else None,
+            "shots": shots,
+            "circuit_kind": kind,
+            "qubits": n,
+            "timestamp_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "counts_raw": counts,
+            "counts_keys": counts_to_keys(counts, n),
+            "transpiled_circuit_qasm": tq_qasm,
+            "transpiled_ops": transpiled_ops,
+            "seed_transpiler": 42 if not self.local else None,
+            "optimization_level": 1 if not self.local else None,
+            "backend_properties": backend_props if 'backend_props' in locals() else {},
+        }
+        with open(raw_file, "w", encoding="utf-8") as f:
+            json.dump(raw_data, f, indent=2, ensure_ascii=False)
+        print(f"  nyers adat elmentve: {raw_file}")
 
         return counts_to_keys(counts, n), n
 

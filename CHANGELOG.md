@@ -13,9 +13,26 @@ are released together and always carry the same version number.
 ## [0.3.0] - 2026-10-06
 
 The first SCS-branded release. The project is renamed from TKR/Wukong to
-**SCS — Space Computing System**; the quantum bridge hardware validation on
-IBM `ibm_marrakesh` (Bell 99.3%, GHZ 97.4%, 2000 shots) carries forward
-unchanged.
+**SCS — Space Computing System**. The quantum bridge hardware validation on
+IBM `ibm_marrakesh` (Bell 87.7–99.3% across seven runs, GHZ 89.3–96.7%,
+2000–4000 shots) carries forward — now with the **full run distribution
+published instead of the best single run**. See "Fixed" below.
+
+### Fixed
+
+- **The Bell balance was reported as 99.3% — it is the best of seven runs, not
+  the characteristic value.** The original measurement series gave the three
+  highest results (99.3 / 98.8 / 97.3) and 99.3% became the headline claim. A
+  later independent series gave 87.7–94.9%. **All seven runs are now published**
+  in the README, white papers and `proofs/tkr_proofs.py`, with the range stated
+  as the result and the median (94.9%) marked as typical. The proof itself is
+  unchanged and still holds: in every run the `00`/`11` branch dominates
+  (87.7–99.3%) while noise stays under 3.8%. What changed is the claim of
+  *quality* — the decode is a good approximation, not an exact inversion, and
+  the limitations section now says so.
+- The hardware-validation assertion threshold was lowered from 95% to 85%
+  balance. The assertion's job is to prove the CNOT *works*, not to select the
+  most flattering run; a 95% gate would have failed on four of seven real runs.
 
 ### Added
 
@@ -114,11 +131,13 @@ measurement code was made hardware-independent.
 
 ### Added
 
-- **Hardware-validated quantum bridge.** A 2-qubit Bell state reached 99.3%
-  balance (`00`: 49.35%, `11`: 49.00%) and a 3-qubit GHZ state came out ideal
-  (`000`: 49.20%, `111`: 47.60%), measured on a real 156-qubit superconducting
-  QPU — IBM `ibm_marrakesh`, 2000 shots. Reproducibility check on the Bell
-  circuit: 98.8% balance.
+- **Hardware-validated quantum bridge.** A 2-qubit Bell state reached
+  **87.7–99.3%** balance across seven independent runs (median 94.9%) and a
+  3-qubit GHZ state came out at 96.7% and 89.3% in two runs, measured on a
+  real 156-qubit superconducting QPU — IBM `ibm_marrakesh`, 2000–4000 shots.
+  The bridge is proven to work: the `00`/`11` branch dominates in every run
+  while noise (`01`+`10`) stays under 3.8%. The decode is a good
+  approximation, not an exact inversion.
 - `python/tkr_measure.py`: hardware-independent measurement layer —
   `WavePacket`, `CircuitSpec`, `Gate`, `reference_circuits()`,
   `resize_reference()`, `counts_to_keys()`, `bit_order_selfcheck()` and

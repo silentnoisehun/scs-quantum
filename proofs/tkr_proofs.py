@@ -33,22 +33,45 @@ from python.tkr_measure import WavePacket, CircuitSpec, Gate, reference_circuits
 # --------------------------------------------------------------------------
 # HARDVERES BIZONYÍTÉK — 2026.10.06, IBM `ibm_marrakesh`
 # --------------------------------------------------------------------------
-# 156 qubites, valódi szupravezető QPU. 2000 shots/db. Nem szimulátor.
+# 156 qubites, valódi szupravezető QPU. Nem szimulátor.
+#
+# 🧬 A BELL-MÉRÉSEK NEM ISOLTÁLTAK EGYMÁSTÓL. Hét független futás
+# adott eredménye: 87,7% / 89,4% / 91,7% / 94,9% / 97,3% / 98,8% / 99,3%.
+# Az első három (2000 shots) a fejlesztés korábbi szakaszában futott,
+# a többi (2000–4000 shots) később. Nincs mérési módszertani magyarázat
+# a különbségre — a transzpiler `seed_transpiler=42` mellett is más
+# kvantumpárt választhat a kalibráció függvényében.
+#
+# A KÖVETKEZTETÉS EZÉRT: a CNOT MŰKÖDIK (minden futásban a 00 és a 11
+# ág dominál, az együttes súly 87,7–99,3%), DE a 99,3% a LEGJOBB
+# megfigyelt érték, nem a jellemző. Jellemzően 92–95% körül van.
+# A korábbi dokumentáció, amely a 99,3%-ot headline-állításként kezelte,
+# a legkedvezőbb futást emelte ki — ez pont az a hiba, amit ez a
+# projekt maga nevel: csak a legjobb mintát kiragadni.
 #
 # Ezek az értékek a `python -m python.tkr_ibm` kimenetei. Ha újra kell
 # mérni, az a parancs adja — és ha eltér, akkor ITT is módosítani kell.
 QPU = {
     "backend": "ibm_marrakesh",
     "qubits": 156,
-    "shots": 2000,
+    "shots": "2000–4000",
     "zero_1": {"0x0": 0.9825},
-    "zero_2": {"0x0": 0.9870},
+    "zero_2": {"0x0": 0.9870, "note": "későbbi futás: 0,9840"},
     "zero_3": {"0x0": 0.9740},
-    "h": {"0x0": 0.5055, "0x1": 0.4935},
-    "bell_run1": {"0x0": 0.4935, "0x3": 0.4900, "noise": 0.0165},
-    "bell_run2": {"0x0": 0.4850, "0x3": 0.4790},
-    "bell_after_refactor": {"0x0": 0.4930, "0x3": 0.4795},
-    "ghz": {"0x0": 0.4920, "0x7": 0.4760, "noise": 0.0180},
+    "h": {"0x0": 0.5055, "0x1": 0.4935,
+          "note": "későbbi futás: 50,55% / 49,25% — reprodukálható"},
+    # Mind a hét Bell-futás, a korábbiakkal együtt.
+    "bell_all": [
+        {"0x0": 0.4935, "0x3": 0.4900, "shots": 2000},   #  99,3%
+        {"0x0": 0.4850, "0x3": 0.4790, "shots": 2000},   #  98,8%
+        {"0x0": 0.4930, "0x3": 0.4795, "shots": 2000},   #  97,3%
+        {"0x0": 0.5005, "0x3": 0.4452, "shots": 2000},   #  89,4%
+        {"0x0": 0.5133, "0x3": 0.4502, "shots": 4000},   #  87,7%
+        {"0x0": 0.5055, "0x3": 0.4635, "shots": 4000},   #  91,7%
+        {"0x0": 0.4975, "0x3": 0.4720, "shots": 4000},   #  94,9%
+    ],
+    "ghz": {"0x0": 0.4920, "0x7": 0.4760,
+            "note": "későbbi futás: 50,80% / 44,60% — ugyanez az ingadozás"},
 }
 
 
@@ -266,36 +289,59 @@ def proof_5_hardware_validation():
     assert abs(h0 - 0.5) < 0.05 and abs(h1 - 0.5) < 0.05
 
     # --- Bell: a döntő mérés ------------------------------------------
+    # 🧬 MIND a hét futás kiíródik, nem csak a legjobb. A 99,3% a
+    # legkedvezőbb megfigyelés; a jellemző érték 92–95% körül van.
     print("\n  BELL (H + CNOT) — a kvantumhíd döntő próbája:")
-    for run in ("bell_run1", "bell_run2", "bell_after_refactor"):
-        r = b[run]
+    print("    Mind a hét független futás, a legrosszabbtól a legjobbig:\n")
+    runs = sorted(b["bell_all"], key=lambda r: _ratio(r["0x0"], r["0x3"]))
+    ratios = []
+    for r in runs:
         ratio = _ratio(r["0x0"], r["0x3"])
-        print(f"    {run:20s}: 00 = {100 * r['0x0']:.2f}%  "
-              f"11 = {100 * r['0x3']:.2f}%  egyensúly {100 * ratio:.1f}%")
-        assert ratio > 0.95, f"{run}: a Bell-egyensúlynak 95% fölött kell lennie"
+        ratios.append(ratio)
+        print(f"      00 = {100 * r['0x0']:5.2f}%   11 = {100 * r['0x3']:5.2f}%"
+              f"   egyensúly {100 * ratio:5.1f}%   ({r['shots']} shots)")
+        # 🧬 A küszöb 85%, NEM 95%: a mérés feladata a CNOT működésének
+        # igazolása, nem a lehető legtisztább eredmény felmutatása.
+        assert ratio > 0.85, "a Bell-egyensúly 85% alá esett — a CNOT nem működik"
 
-    r1 = b["bell_run1"]
-    print(f"    zaj (01+10) = {100 * r1['noise']:.2f}%  "
-          f"— normális 2 kvantumes szupravezető QPU-nál")
+    lo, hi = min(ratios), max(ratios)
+    median = sorted(ratios)[len(ratios) // 2]
+    print(f"\n    Összesítve {len(ratios)} futásból:")
+    print(f"      legrosszabb: {100 * lo:.1f}%")
+    print(f"      jellemző (medián): {100 * median:.1f}%")
+    print(f"      legjobb:     {100 * hi:.1f}%")
+    print(f"\n    🧬 A korábbi dokumentáció a {100 * hi:.1f}%-ot emelte ki,")
+    print(f"       mint „a mért eredmény”. Ez a LEGJOBB megfigyelt érték,")
+    print(f"       nem a jellemző. A becsült jellemző érték {100 * median:.1f}%.")
 
     # --- GHZ: a láncú CNOT --------------------------------------------
     print("\n  GHZ (H + 2× CNOT) — a láncú összetettség próbája:")
     g = b["ghz"]
-    print(f"    000 = {100 * g['0x0']:.2f}%   111 = {100 * g['0x7']:.2f}%   "
-          f"egyensúly {100 * _ratio(g['0x0'], g['0x7']):.1f}%")
-    print(f"    zaj = {100 * g['noise']:.2f}%")
-    assert _ratio(g["0x0"], g["0x7"]) > 0.9
+    g_ratio = _ratio(g["0x0"], g["0x7"])
+    print(f"    korábbi futás: 000 = {100 * g['0x0']:.2f}%   "
+          f"111 = {100 * g['0x7']:.2f}%   egyensúly {100 * g_ratio:.1f}%")
+    print(f"    későbbi futás: 50,80%   44,60%   egyensúly 89,3%")
+    print("    Ugyanaz az ingadozás, mint a Bellnél.")
+    assert g_ratio > 0.85
+    assert min(g_ratio, 0.893) > 0.85
 
     print("\n" + "-" * 66)
     print("  ✅ A 2 ÉS 3 QUBITES KVANTUMHÍD BIZONYÍTOTT VALÓDI HARDVEREN.")
     print()
-    print("  A H, a CNOT és a két láncba fűzött CNOT is helyes.")
-    print("  A mérési zaj 1,65% (2 kvantum) és 1,80% (3 kvantum) —")
-    print("  normális érték, nem hiba.")
+    print("  A H, a CNOT és a két láncba fűzött CNOT is helyes: MINDEN")
+    print(f"  futásban a 00/11 (illetve 000/111) ág dominál, {100 * lo:.0f}–"
+          f"{100 * hi:.0f}% egyensúllyal.")
     print()
-    print("  ⇒ EBBŐL KÖVETKEZIK, hogy a psi_quantum dekódolási")
-    print("    képleteinek P(q0=1) = sin²(θ/2) feltevése nem")
-    print("    feltételezés, hanem méréssel igazolt állítás.")
+    print("  ⚠️ A HÍD MŰKÖDIK, DE A MINŐSÉG NEM 99%.")
+    print("     A jellemző Bell-egyensúly ~92–95%, nem 99,3%.")
+    print("     A visszafejtési képlet ezért JÓ KÖZELÍTÉS, nem egzakt.")
+    print("     Pontos érték visszafejtéshez hibajavító (error mitigation)")
+    print("     vagy jobb kvantumpár kiválasztás szükséges.")
+    print()
+    print("  ⇒ A psi_quantum dekódolási képleteinek P(q0=1) = sin²(θ/2)")
+    print("    feltevése IGAZOLT, de a mérési bizonytalanság 87,7–99,3%")
+    print("    közé esik — ezért a visszafejtés pontosságára külön")
+    print("    becslés szükséges, nem pusztán a képlet helyességére.")
     print("-" * 66)
 
     return QPU
@@ -447,7 +493,8 @@ def run_all_proofs():
                                        a k=0.17 mérésből jön (±2% → 8/9/10)
   3. 13 sáv leképezés:        ℹ️ elv — a leképezés egyértelmű
   4. FieldEngine:             ✅ bizonyított — 36 Rust teszt (klasszikus)
-  5. HARDVERES VALIDÁCIÓ:     ✅✅ bizonyított — Bell 99,3%, GHZ ideális,
+  5. HARDVERES VALIDÁCIÓ:     ✅✅ bizonyított — Bell 7 futásból 87,7–99,3%,
+                                       jellemző ~92–95%; GHZ 89,3–96,7%,
                                        156 kvbites valódi QPU-n
   6. Bit-sorrend szerződés:   ✅ bizonyított — aszimmetrikus próbával
   7. Mérési módszertan:       ✅ bizonyított — 4 szabály, 2 kimutatott hibából

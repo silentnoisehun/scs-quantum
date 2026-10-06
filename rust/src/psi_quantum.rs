@@ -16,8 +16,13 @@
 //!
 //! 🧬 A dekódolási képletek (`P = sin²(θ/2)` → `arcsin`) feltételezik,
 //! hogy a CNOT korrekt. Ez NEM feltételezés, hanem mérés: 2026.10.06,
-//! valódi 156 qubites szupravezető QPU-n a Bell-állapot egyensúlya 99,3%
-//! volt (2000 shots). A 2 qubetes híd tehát hardveresen igazolt.
+//! valódi 156 qubites szupravezető QPU-n a Bell-állapot egyensúlya hét
+//! független futásból 87,7–99,3% volt (jellemzően ~92–95%,
+//! 2000–4000 shots). A 2 qubetes híd tehát hardveresen igazolt.
+//!
+//! ⚠️ A bizonytalanság azonban nem nulla: a visszafejtett érték JÓ
+//! KÖZELÍTÉS, nem egzakt visszaállítás. A 99,3% a legjobb megfigyelt
+//! futás — nem szabad jellemző értékként kezelni.
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
@@ -446,8 +451,9 @@ mod tests {
 
     #[test]
     fn required_qubits_is_two() {
-        // A 2+ qubit-es híd hardveresen igazolt: Bell 99,3%,
-        // GHZ ideális (2026.10.06, 156 qubit, valódi QPU).
+        // A 2+ qubit-es híd hardveresen igazolt: Bell-egyensúly 87,7–99,3%
+        // (7 futás, jellemző ~92–95%), GHZ 89,3–96,7%
+        // (2026.10.06, 156 qubit, valódi QPU).
         assert_eq!(TKR_REQUIRED_QUBITS, 2);
     }
 

@@ -8,11 +8,17 @@
 //! - **`psi_quantum`** — a WavePacket → kvantumáramkör kódolás és a
 //!   visszafejtés.
 //!
-//! 🧬 HARTVERES BIZONYÍTÉK (2026.10.06, 156 qubites IBM szupravezető QPU,
-//! 2000 shots/db): a 2 qubites Bell-állapot egyensúlya **99,3%**, a 3
-//! qubites GHZ ideális. A `psi_quantum` dekódolási képleteinek
+//! 🧬 HARDVERES BIZONYÍTÉK (2026.10.06, 156 qubites IBM szupravezető QPU,
+//! 2000–4000 shots/db): a 2 qubites Bell-állapot egyensúlya hét
+//! független futásból **87,7–99,3%** (jellemzően ~92–95%), a 3 qubites
+//! GHZ 89,3–96,7%. A `psi_quantum` dekódolási képleteinek
 //! `P(q0=1) = sin²(θ/2)` feltevése tehát méréssel igazolt, nem
 //! feltételezés.
+//!
+//! ⚠️ DE A VISSZAFEJTÉS NEM EGZAKT: a mérési bizonytalanság miatt a
+//! visszafejtett érték JÓ KÖZELÍTÉS. A 99,3% a legjobb megfigyelt
+//! futás, nem a jellemző érték — lásd a `README.md` hardveres
+//! eredménytáblázatát a hét futás mindegyikével.
 //!
 //! A crate NEM tartalmaz hálózati klienst vagy eszközazonosítót: a
 //! kvantumáramkör kimenete platformfüggetlen adatszerkezet, amit a

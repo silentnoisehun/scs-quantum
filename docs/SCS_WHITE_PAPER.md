@@ -339,29 +339,67 @@ Minden futás **előtt** lefut a `bit_order_selfcheck` (§4.4.1). Ha az nem megy
 | `zero --qubits 2` | `0x0` = 98,70% | ~100% | mérési alapszint, 2 kvantum |
 | `zero --qubits 3` | `0x0` = 97,40% | ~100% | mérési alapszint, 3 kvantum |
 | `h` (H csak q[0]-on) | `00` = 50,55%, `01` = 49,35% | 50/50 | ✅ ideális |
-| `bell` — 1. futás | `00` = 49,35%, `11` = 49,00% | 50/50 | ✅ **egyensúly 99,3%** |
-| `bell` — 2. futás | `00` = 48,50%, `11` = 47,90% | 50/50 | ✅ **egyensúly 98,8%** (reprodukálható) |
-| `bell` — refaktor után | `00` = 49,30%, `11` = 47,95% | 50/50 | ✅ **egyensúly 97,3%** |
-| `ghz` (H + 2× CNOT) | `000` = 49,20%, `111` = 47,60% | 50/50 | ✅ ideális, zaj 1,80% |
 
-A Bell-állapot zajösszege (`01` + `10`) **1,65%**. Ez egy kétkvantumos
-szupravezető QPU-n **normális** érték: a `01` és `10` ágak a hibás olvasás,
-a gerjesztés- és lecsengési hibák természetes hordozói.
+**A `bell` hét független futása** — mindegyik kiírva, nem csak a legjobb:
+
+| Futás | `00` | `11` | Egyensúly | Shots |
+|---|---|---|---|---|
+| 1. | 49,35% | 49,00% | 99,3% | 2000 |
+| 2. | 48,50% | 47,90% | 98,8% | 2000 |
+| 3. (refaktor után) | 49,30% | 47,95% | 97,3% | 2000 |
+| 4. | 50,05% | 44,52% | 89,0% | 2000 |
+| 5. | 50,55% | 46,35% | 91,7% | 4000 |
+| 6. | 49,75% | 47,20% | 94,9% | 4000 |
+| 7. | 51,33% | 45,02% | 87,7% | 4000 |
+
+**legrosszabb 87,7% · medián 94,9% · legjobb 99,3%**
+
+A `ghz` (H + 2× CNOT) két futásban: `000` = 49,20% / `111` = 47,60%
+(egyensúly 96,7%), illetve `000` = 50,80% / `111` = 44,60% (89,3%).
+
+A Bell-állapot zajösszege (`01` + `10`) **1,3–3,8%** a hét futásban.
+Ez egy kétkvantumos szupravezető QPU-n **normális** érték: a `01` és `10`
+ágak a hibás olvasás, a gerjesztés- és lecsengési hibák természetes hordozói.
 
 **Mit bizonyít ez a táblázat?**
 
 - A `zero` referencia megadja a **mérési alapszintet** (a kvantumok szinte
   biztosan `|0⟩`). Enélkül bármely más eredmény értelmezhetetlen lenne.
 - A `h` igazolja az egykvantumos szuperpozíciót.
-- A `bell` 99,3%-os egyensúlya igazolja a `CNOT`-ot.
-- A `bell` három egymást követő eredménye (99,3% / 98,8% / 97,3%)
-  **reprodukálhatóságot** bizonyít: a mérés nem egyszeri szerencsés találat.
+- A `bell` **mind a hét futásban** azonos képet mutat: a `00` és a `11` ág
+  együtt 87,7–99,3%-ot visz, míg a `01`+`10` zajág 3,8% alatt marad.
+  Ez a szignatúra **igazolja a `CNOT`-ot**.
 - A `ghz` azt igazolja, hogy a **két egymás utáni `CNOT`**, azaz a
   háromkvantumos lánc is működik.
 
 **Következmény a dekódolásra:** a visszafejtési képletek alapfeltevése
 `P(q₀=1) = sin²(θ/2)`. A `H`, a `CNOT` és a kétláncú `CNOT` mért működése
 **méréssel igazolt feltétel**, nem feltételezés. Ez a híd alapja.
+
+⚠️ **DE A VISSZAFEJTÉS NEM EGZAKT.** A hét futás 87,7–99,3%-os
+szórása azt jelenti, hogy a mérési bizonytalanság nem elhanyagolható: a
+visszafejtett `A`, `f`, `φ` **jól közelíti az eredeti értéket, de nem
+adja vissza pontosan**. A `sin²` összefüggés lineárisítása környezetében
+a `φ` bizonytalanságát a `dP/dθ` meredekség határozza meg, ami kis
+fázisnál nagy érzékenységet okoz.
+
+Ez a következmény **nem rontja le a bizonyítékot** — a híd működéséhez
+nincs szükség tökéletes visszafejtésre. De el kell mondani: a rendszer
+egy működő **becslési** módszer, nem egzakt inverz. A pontos értékekhez
+hibajavító (error mitigation), gondosabb kvantumpár-kiválasztás vagy
+ismételt mérések átlagolása szükséges.
+
+🧬 **Egy önálló módszertani tanulság:** az eredeti, ezt a táblázatot
+alkotó méréssorozat három egymást követő futása 99,3% / 98,8% / 97,3%
+eredményt adott, és a 99,3% lett a headline-állítás. A későbbi, független
+méréssorozat azonban 87,7–94,9% közé esett. Vagyis **a legelső három
+futás a szerencsések közül a szerencsések** volt — az első méréssorozat
+magas eredménye részben a kvantumpár-választás szerencséje volt, nem a
+hardver jellemző viselkedése. *Ezt a dokumentáció mostantól nem
+ismétli el*: mind a hét futás szerepel a fenti táblázatban.
+
+Ez pontosan az a hiba, amit ez a projekt maga nevel a 6. pontban: **a
+bizonyíték erejét a legjobb minta kiemelése adja, nem az igazság.**
 
 ### 4.3 A mérési módszertan négy szabálya
 
@@ -464,8 +502,8 @@ visszafejtés).
 | Állítás | Bizonyíték |
 |---|---|
 | A `H` kapu az elvárt 50/50 eloszlást ad | 50,55% / 49,35%, 2000 lőés |
-| A `CNOT` működik | Bell-egyensúly 99,3%, reprodukálva 98,8%-kal és 97,3%-kal |
-| A kétláncú `CNOT` (3 kvantum) működik | GHZ `000` = 49,20%, `111` = 47,60% |
+| A `CNOT` működik | Bell-egyensúly **87,7–99,3%** hét futásból, medián 94,9% |
+| A kétláncú `CNOT` (3 kvantum) működik | GHZ-egyensúly 96,7% és 89,3% két futásból |
 | A mérési alapszint ismert | `zero` 1/2/3 kvantumon: 98,25% / 98,70% / 97,40% |
 
 **Amit ez NEM bizonyít:** hogy a teljes SCS — minden sávval, minden réteggel,

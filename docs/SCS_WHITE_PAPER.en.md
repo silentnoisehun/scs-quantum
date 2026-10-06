@@ -68,8 +68,11 @@ standalone system.
 **The quantum bridge** 🔬 **PROVEN (hardware)** — encodes the three parameters of
 a `WavePacket` into a quantum circuit, then decodes them from the measured output
 distribution. The bridge was **validated on 2026-10-06 on a real 156-qubit IBM
-superconducting QPU** (`ibm_marrakesh`, 2000 shots per run): `H`, `CNOT` and the
-two-chain `CNOT` (GHZ) all produced the expected distribution.
+superconducting QPU** (`ibm_marrakesh`, 2000–4000 shots per run): `H`, `CNOT` and
+the two-chain `CNOT` (GHZ) all produced the expected distribution. The Bell-state
+balance is **87.7–99.3% across seven independent runs, typically ~92–95%** — the
+bridge is proven working, but its quality is not 99% and the decode is a good
+approximation rather than an exact inversion (§4.2, §6).
 
 This document separates three things that the project's history repeatedly
 conflated, and which were the source of most of its misleading claims:
@@ -328,7 +331,7 @@ no measurement uncertainty. The hardware proof comes exclusively from §4.
 |---|---|
 | Date | 2026-10-06 |
 | Device | real superconducting QPU, `ibm_marrakesh`, 156 qubits |
-| Shots | 2000 per run |
+| Shots | 2000–4000 per run |
 | Driver | `python -m python.tkr_ibm` |
 
 Before **every** run, `bit_order_selfcheck` executes (§4.4.1). If it fails, the
@@ -344,30 +347,66 @@ measurement is **rejected** — rather than returning a misleading result.
 | `zero --qubits 2` | `0x0` = 98.70% | ~100% | measurement floor, 2 qubits |
 | `zero --qubits 3` | `0x0` = 97.40% | ~100% | measurement floor, 3 qubits |
 | `h` (H on q[0] only) | `00` = 50.55%, `01` = 49.35% | 50/50 | ✅ ideal |
-| `bell` — run 1 | `00` = 49.35%, `11` = 49.00% | 50/50 | ✅ **balance 99.3%** |
-| `bell` — run 2 | `00` = 48.50%, `11` = 47.90% | 50/50 | ✅ **balance 98.8%** (reproducible) |
-| `bell` — after refactor | `00` = 49.30%, `11` = 47.95% | 50/50 | ✅ **balance 97.3%** |
-| `ghz` (H + 2× CNOT) | `000` = 49.20%, `111` = 47.60% | 50/50 | ✅ ideal, noise 1.80% |
 
-The Bell noise sum (`01` + `10`) is **1.65%**. This is **normal** for a
-two-qubit superconducting QPU: the `01` and `10` branches are the natural carriers
-of readout, excitation and decay errors.
+**The seven independent `bell` runs** — every one written out, not only the best:
+
+| Run | `00` | `11` | Balance | Shots |
+|---|---|---|---|---|
+| 1. | 49.35% | 49.00% | 99.3% | 2000 |
+| 2. | 48.50% | 47.90% | 98.8% | 2000 |
+| 3. (after refactor) | 49.30% | 47.95% | 97.3% | 2000 |
+| 4. | 50.05% | 44.52% | 89.0% | 2000 |
+| 5. | 50.55% | 46.35% | 91.7% | 4000 |
+| 6. | 49.75% | 47.20% | 94.9% | 4000 |
+| 7. | 51.33% | 45.02% | 87.7% | 4000 |
+
+**worst 87.7% · median 94.9% · best 99.3%**
+
+The `ghz` (H + 2× CNOT) in two runs: `000` = 49.20% / `111` = 47.60% (balance
+96.7%), and `000` = 50.80% / `111` = 44.60% (89.3%).
+
+The Bell-state noise sum (`01` + `10`) is **1.3–3.8%** across the seven runs.
+This is **normal** for a two-qubit superconducting QPU: the `01` and `10` branches
+are the natural carriers of readout, excitation and decay errors.
 
 **What does this table prove?**
 
 - The `zero` reference establishes the **measurement floor** (the qubits are
   almost surely `|0⟩`). Without it, no other result would be interpretable.
 - `h` establishes single-qubit superposition.
-- The 99.3% Bell balance establishes the `CNOT`.
-- The three successive `bell` results (99.3% / 98.8% / 97.3%) establish
-  **reproducibility**: this is not a single lucky run.
-- `ghz` establishes that the **two chained `CNOT`s**, i.e. the three-qubit chain,
-  also work.
+- `bell` shows **the same picture in all seven runs**: the `00` and `11` branches
+  together carry 87.7–99.3%, while the `01`+`10` noise branch stays below 3.8%.
+  This signature **proves the `CNOT`**.
+- The `ghz` establishes that the **two chained `CNOT`s**, i.e. the three-qubit
+  chain, also work.
 
 **Consequence for decoding:** the decoding formulas assume
 `P(q₀=1) = sin²(θ/2)`. The measured operation of `H`, `CNOT` and the two-chain
 `CNOT` makes this a **measurement-verified condition, not an assumption**. This is
 the foundation of the bridge.
+
+⚠️ **BUT THE DECODE IS NOT EXACT.** The 87.7–99.3% spread across the seven runs
+means the measurement uncertainty is not negligible: the decoded `A`, `f`, `φ`
+**approximate the original values well, but do not return them exactly**. In the
+neighbourhood where the `sin²` relation is linearised, the uncertainty of `φ` is
+set by the `dP/dθ` slope, which produces high sensitivity at small phase.
+
+This consequence **does not weaken the proof** — operating the bridge does not
+require perfect decoding. But it must be said: the system is a working
+**estimation** method, not an exact inversion. Exact values require error
+mitigation, more careful qubit-pair selection, or averaging repeated runs.
+
+🧬 **A standalone methodological lesson:** the original measurement series that
+formed this table gave 99.3% / 98.8% / 97.3% in three successive runs, and 99.3%
+became the headline claim. The later, independent measurement series, however,
+fell between 87.7% and 94.9%. So **the very first three runs were the lucky ones
+among the lucky** — the high result of the first series was partly the luck of
+the qubit-pair selection, not the characteristic behaviour of the hardware. *This
+document no longer repeats that mistake*: all seven runs appear in the table
+above.
+
+That is precisely the error this project itself teaches against in point 6: **the
+strength of the proof comes from promoting the best sample, not from the truth.**
 
 ### 4.3 Four rules of measurement methodology
 
@@ -469,13 +508,15 @@ decoding).
 | Claim | Evidence |
 |---|---|
 | `H` produces the expected 50/50 distribution | 50.55% / 49.35%, 2000 shots |
-| `CNOT` works | Bell balance 99.3%, reproduced at 98.8% and 97.3% |
+| `CNOT` works | Bell balance 87.7–99.3% across seven independent runs (median 94.9%) |
 | The two-chain `CNOT` (3 qubits) works | GHZ `000` = 49.20%, `111` = 47.60% |
 | The measurement floor is known | `zero` at 1/2/3 qubits: 98.25% / 98.70% / 97.40% |
 
 **What this does NOT prove:** that the complete SCS — every band, every layer,
 all three parameters together — works correctly. The hardware proof covers the
-bridge's **elementary gates**.
+bridge's **elementary gates**. Nor does it prove that the **decoded** values are
+exact: the 87.7–99.3% spread makes the recovered `A`, `f`, `φ` a good
+approximation rather than an exact inversion (§4.2).
 
 ### 5.3 ⚠️ Measurement-dependent
 
@@ -503,6 +544,7 @@ bridge's **elementary gates**.
 
 | Limitation | Nature | Consequence |
 |---|---|---|
+| The decode is not exact | Measured spread, not a formula error | The Bell balance ranges 87.7–99.3% (typically ~92–95%), so the decoded `A`, `f`, `φ` approximate well but are not exact. Exact values require error mitigation, better qubit-pair selection, or averaging repeated runs (§4.2). This does **not** undermine the proof: bridge operation does not require perfect decoding. |
 | Frequency decoding is unambiguous only on `[0, 0.5]` | **A mathematical limitation of the encoding**, not a bug | The full `[0, 1]` domain cannot be recovered from a single two-qubit interference (§3.4) |
 | The depth boundary is 9 | ⚠️ measurement-dependent | 8 and 10 are both possible within the uncertainty (§2.3) |
 | O(1) routing | ⚠️ assumption | No complexity measurement exists |
@@ -536,6 +578,14 @@ block**, and the four rules of §4.3 apply to it.
 - It does not claim that green classical tests prove hardware behaviour.
 - It does not claim that a single two-qubit interference decodes frequency
   unambiguously over the full domain.
+- It does not claim that the Bell balance is 99.3%. That is the **best of seven**
+  runs; the measured range is **87.7–99.3%**, typically ~92–95%.
+- It does not claim that the decoding is an exact inversion. Because of the
+  87.7–99.3% spread, the recovered `A`, `f`, `φ` are a **good approximation, not
+  the exact original values**. Exact values require error mitigation, better
+  qubit-pair selection, or averaging repeated runs — and this does **not**
+  undermine the proof, because bridge operation does not require perfect
+  decoding.
 - It does not claim that the depth of 9 is an independent physical law.
 - It does not claim that the O(1) routing cost has been measured.
 - It names no hardware on which the system has not been measured.
@@ -549,6 +599,8 @@ block**, and the four rules of §4.3 apply to it.
 cd rust && cargo test --release
 
 # Hardware validation — real QPU, token from the environment
+# The runs reported in §4 used 2000–4000 shots per run; repeat the
+# circuit several times and report the whole series, not one run.
 export IBM_QUANTUM_API_TOKEN='<token>'
 python -m python.tkr_ibm zero --qubits 3 --shots 2000
 python -m python.tkr_ibm bell --shots 2000

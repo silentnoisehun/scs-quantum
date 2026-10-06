@@ -4,8 +4,12 @@ Frequency-domain wave-packet encoding with a quantum bridge **validated on real
 quantum hardware**.
 
 > 🧬 **The system's 2- and 3-qubit quantum bridge is hardware-proven.**
-> Measured on a real 156-qubit superconducting QPU: Bell-state balance **99.3%**,
-> GHZ ideal (2000 shots, IBM `ibm_marrakesh`, 2026-10-06).
+> Measured on a real 156-qubit superconducting QPU: Bell-state balance
+> **87.7–99.3%** across seven independent runs, **typically ~92–95%**
+> (IBM `ibm_marrakesh`, 2026-10-06).
+>
+> ⚠️ The bridge **works**, but the quality is not 99%: the decode is a good
+> approximation, not exact. See [Limitations](#limitations--what-the-system-does-not-prove).
 
 **Hungarian:** [README in Hungarian](README.md) ·
 **Documents:** [White Paper (EN)](docs/SCS_WHITE_PAPER.en.md) ·
@@ -44,6 +48,8 @@ python -m proofs.tkr_proofs
 python -m python.tkr_ibm bell --local --shots 2000
 
 # 3. Re-run the hardware evidence (token required)
+# The runs reported below used 2000–4000 shots per run; repeat the
+# circuit several times and report the whole series, not one run.
 pip install "scs-quantum[qpu]"
 export IBM_QUANTUM_API_TOKEN="..."
 python -m python.tkr_ibm devices
@@ -52,7 +58,7 @@ python -m python.tkr_ibm bell --backend ibm_marrakesh --shots 2000
 
 ## Measured hardware results
 
-`ibm_marrakesh`, 156 qubits, real superconducting QPU, 2000 shots per run.
+`ibm_marrakesh`, 156 qubits, real superconducting QPU, 2000–4000 shots per run.
 
 | Circuit | Measured | Balance |
 |---|---|---|
@@ -60,15 +66,39 @@ python -m python.tkr_ibm bell --backend ibm_marrakesh --shots 2000
 | `zero --qubits 2` | `0x0` = 98.70% | measurement floor |
 | `zero --qubits 3` | `0x0` = 97.40% | measurement floor |
 | `h` | `00` = 50.55%, `01` = 49.35% | 50/50 control |
-| **`bell`** | `00` = 49.35%, `11` = 49.00% | **99.3%** |
-| `bell` (run 2) | `00` = 48.50%, `11` = 47.90% | **98.8%** |
-| `bell` (after refactor) | `00` = 49.30%, `11` = 47.95% | **97.3%** |
-| **`ghz`** | `000` = 49.20%, `111` = 47.60% | ideal, noise 1.80% |
 
-Bell noise (01+10) = 1.65% — normal for a 2-qubit superconducting QPU.
+### Bell — all seven runs, not just the best
+
+| Run | `00` | `11` | Balance | Shots |
+|---|---|---|---|---|
+| 1. | 49.35% | 49.00% | 99.3% | 2000 |
+| 2. | 48.50% | 47.90% | 98.8% | 2000 |
+| 3. (after refactor) | 49.30% | 47.95% | 97.3% | 2000 |
+| 4. | 50.05% | 44.52% | 89.0% | 2000 |
+| 5. | 50.55% | 46.35% | 91.7% | 4000 |
+| 6. | 49.75% | 47.20% | 94.9% | 4000 |
+| 7. | 51.33% | 45.02% | 87.7% | 4000 |
+
+**worst 87.7% · median 94.9% · best 99.3%**
+
+### GHZ
+
+| Run | `000` | `111` | Balance |
+|---|---|---|---|
+| earlier | 49.20% | 47.60% | 96.7% |
+| later | 50.80% | 44.60% | 89.3% |
+
+🧬 **Why do we publish all seven runs?** Because 99.3% is the best observed
+value, not the characteristic one. If only the best is written down, the system
+looks far better than the measurement justifies — and that is exactly the flaw
+committed by naive proof, which generalises from a single successful measurement.
+The bridge **works** (the 00/11 branch dominates in every run), but the quality is
+not 99%.
 
 **From this follows** that the decoding formulas' assumption
-`P(q0=1) = sin²(θ/2)` is not an assumption but a measurement-verified claim.
+`P(q0=1) = sin²(θ/2)` is not an assumption but a measurement-verified claim — but
+because of the measurement spread (87.7–99.3%), the **accuracy of the decoded
+values** needs a separate estimate.
 
 ## 🧬 Two levels of proof — do not conflate them
 
@@ -158,6 +188,12 @@ does not pass.
 
 ## Limitations — what the system does NOT prove
 
+- **The decode is not exact.** The bridge works, but the Bell balance falls
+  between 87.7% and 99.3% per run (typically ~92–95%). The decoded `A`, `f`, `φ`
+  therefore **approximate well, but do not return the original value exactly**.
+  Exact values require error mitigation, better qubit-pair selection, or more
+  shots. Earlier documentation treated the 99.3% (best) run as the characteristic
+  value — that was an overclaim.
 - **O(1) quantum-resonance routing is an assumption.** No complexity measurement
   exists, and a 2-qubit encoding does not by itself give a quantum advantage — a
   classical computation does the same thing.
