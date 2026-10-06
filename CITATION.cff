@@ -29,7 +29,7 @@ abstract: >-
   depend only on the Python standard library. Classical and hardware proofs are
   reported as strictly separate evidence levels.
 type: software
-version: 0.2.0
+version: 0.3.0
 date-released: "2026-10-06"
 license: MIT
 authors:
