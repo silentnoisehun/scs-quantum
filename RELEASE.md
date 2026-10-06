@@ -72,13 +72,29 @@ Pushing the tag triggers `.github/workflows/release.yml`, which:
 3. publishes to PyPI and crates.io,
 4. creates the GitHub Release with the sdist and wheel attached.
 
-**You must set these repository secrets first** (`Settings → Secrets`):
+### 3.1 One-time PyPI setup: trusted publishing
 
-| Secret | Used by |
-|---|---|
-| `PYPI_API_TOKEN` | the PyPI upload |
-| `CARGO_REGISTRY_TOKEN` | the crates.io upload |
-| `GITHUB_TOKEN` | automatic — already available |
+The workflow uses **PyPI trusted publishing (OIDC)**, not an API token. This must
+be configured once on PyPI, otherwise the publish step fails with
+`missing or insufficient OIDC token permissions`.
+
+1. Create the project on <https://pypi.org/manage/account/publishing/> (or
+   claim the name `tkr-quantum` if it is available).
+2. Add a **pending publisher** on the project page:
+   - **Owner:** `silentnoisehun`
+   - **Repository:** `tkr-quantum`
+   - **Workflow name:** `release.yml`
+   - **Environment:** *(leave empty)*
+
+No `PYPI_API_TOKEN` secret is needed, and none should be created — OIDC means
+GitHub proves the identity to PyPI cryptographically, so there is no long-lived
+credential in the repository at all.
+
+### 3.2 One-time crates.io setup
+
+Create an API token at <https://crates.io/settings/tokens> and add it as the
+repository secret `CARGO_REGISTRY_TOKEN`. A token **is** required here, because
+crates.io has no equivalent of OIDC trusted publishing.
 
 > 🧬 **What the release workflow does NOT do:** it does not run a QPU measurement.
 > That requires your own IBM token and is done by hand

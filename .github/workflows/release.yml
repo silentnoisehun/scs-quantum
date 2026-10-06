@@ -69,6 +69,13 @@ jobs:
     needs: verify
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
+    # `contents: write` for the release, `id-token: write` for PyPI trusted
+    # publishing. BOTH are required: without `id-token: write` the PyPI action
+    # cannot obtain its OIDC token and fails with "missing or insufficient OIDC
+    # token permissions".
+    permissions:
+      contents: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -76,10 +83,19 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Publish to PyPI
+      - name: Build the distribution
+        # The publish job runs on a FRESH runner, so `dist/` does not exist
+        # here — the artifacts built in the `verify` job are not carried over.
+        # Building again is cheap and keeps each job self-contained.
+        run: |
+          pip install --upgrade build
+          python -m build
+
+      - name: Upload to PyPI (trusted publishing)
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+        # No token needed: this uses PyPI trusted publishing via OIDC, which is
+        # why `id-token: write` is mandatory above. The project on PyPI must
+        # have this workflow's repository configured as a trusted publisher.
 
       - name: Publish the crate to crates.io
         run: |
