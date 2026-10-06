@@ -10,6 +10,59 @@ are released together and always carry the same version number.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-06
+
+The first SCS-branded release. The project is renamed from TKR/Wukong to
+**SCS — Space Computing System**; the quantum bridge hardware validation on
+IBM `ibm_marrakesh` (Bell 99.3%, GHZ 97.4%, 2000 shots) carries forward
+unchanged.
+
+### Added
+
+- `docs/SCS_WHITE_PAPER.md` and `docs/SCS_WHITE_PAPER.en.md` (renamed from
+  `TKR_WHITE_PAPER_v2*.md`)
+- `docs/SCS_QUANTUM_DESIGN.md` and `docs/SCS_QUANTUM_DESIGN.en.md` (renamed
+  from `TKR_QUANTUM_DESIGN*.md`)
+- `README.en.md`: English README as PyPI long description
+- `RELEASE.md`: ordered procedure for DOI (Zenodo concept vs version), arXiv
+  submission, and PyPI/crates.io trusted publishing setup
+- `config/.env.template`: placeholder template for local credentials (already
+  in `.gitignore` and `MANIFEST.in`)
+- CI (`.github/workflows/ci.yml`): Rust tests, stdlib-only import check,
+  proof suite, ideal-simulation pipeline check, secrets guard
+- Release automation (`.github/workflows/release.yml`): verifies classical
+  proof, checks sdist contents, publishes to PyPI (OIDC) and crates.io,
+  creates GitHub Release
+
+### Changed
+
+- **Project renamed to SCS — Space Computing System.** TKR/Wukong naming
+  removed from all content and publication metadata: document titles,
+  `README.md`, `README.en.md`, `CITATION.cff`, `pyproject.toml`,
+  `rust/Cargo.toml`, `CHANGELOG.md`, `RELEASE.md`, workflow URLs, `LICENSE`
+  copyright. GitHub repository is now
+  `https://github.com/silentnoisehun/scs-quantum`, Python distribution and
+  Rust crate are both `scs-quantum`, console script is `scs-qpu`. Document
+  filenames updated accordingly. The Python module names
+  (`tkr_measure`, `tkr_ibm`, `tkr_proofs`) and the public Rust constant
+  `TKR_REQUIRED_QUBITS` are **intentionally kept** — renaming them would
+  break existing invocations. No measurement, proof grade, or physical
+  claim changed in this rename.
+- Author metadata now names the project owner (`Máté Róbert`) in
+  `CITATION.cff`, `pyproject.toml`, `LICENSE`, and `README.en.md` BibTeX
+  block, replacing the collective `SCS contributors` placeholder.
+- README: measured-results table now lists Bell reproducibility runs
+  (99.3% / 98.8% / 97.3%) separately. The GHZ row now reports raw
+  measurement and measured noise, consistent with the white paper.
+- `pyproject.toml`: package URLs point at the public repository; English
+  README is the PyPI long description.
+- Version bumped to 0.3.0 for the SCS-branded release (v0.2.0 tag remains
+  on the final TKR commit c2f017f).
+
+[Unreleased]: https://github.com/silentnoisehun/scs-quantum/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/silentnoisehun/scs-quantum/releases/tag/v0.3.0
+[0.2.0]: https://github.com/silentnoisehun/scs-quantum/releases/tag/v0.2.0
+
 ### Added
 
 - English versions of both documents: `docs/SCS_WHITE_PAPER.en.md` and

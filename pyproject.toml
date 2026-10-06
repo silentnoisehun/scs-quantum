@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scs-quantum"
-version = "0.2.0"
+version = "0.3.0"
 description = "SCS (Space Computing System): frequency-domain WavePacket encoding with a hardware-validated quantum bridge"
 # The PyPI landing page is read by an international audience first, so the
 # English README is the package long_description. The Hungarian one stays in
