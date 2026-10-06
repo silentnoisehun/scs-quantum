@@ -1,0 +1,18 @@
+[workspace]
+members = ["rust"]
+resolver = "2"
+
+[workspace.package]
+version = "0.3.0"
+edition = "2021"
+license = "MIT"
+description = "SCS (Space Computing System) hardware-independent quantum bridge"
+category = ["science", "algorithms"]
+keywords = ["quantum", "encoding", "wave-packet", "interference"]
+
+[profile.release]
+opt-level = 3
+debug = false
+strip = true
+lto = true
+codegen-units = 1
