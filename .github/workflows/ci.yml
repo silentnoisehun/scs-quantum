@@ -33,7 +33,7 @@ jobs:
 
       - name: Run the test suite
         working-directory: rust
-        run: cargo test --release --locked
+        run: cargo test --release
         # 🧬 A 36 teszt a KLASSZIKUS szoftver helyességét igazolja.
         # Nem hardveres bizonyíték. A zöld eredmény NEM jelent QPU-mérést.
 
