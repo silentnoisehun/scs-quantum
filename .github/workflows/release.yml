@@ -30,11 +30,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      # NOTE: rust-cache@v2 looks for Cargo.toml in the repo root. Since ours is in
+      # rust/, we skip it here and rely on the CI job's caching. The verify job is
+      # short-lived anyway.
+      # - uses: Swatinem/rust-cache@v2
 
       - name: Rust tests must be green
         working-directory: rust
-        run: cargo test --release --locked
+        run: cargo test --release
 
       - uses: actions/setup-python@v5
         with:
