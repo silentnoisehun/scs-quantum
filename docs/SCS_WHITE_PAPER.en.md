@@ -1,10 +1,10 @@
-# The Térkódoló Rendszer (TKR)
+# The Space Computing System (SCS)
 
 ## White Paper — A Quantum Bridge Validated on Real Hardware
 
 **Version:** 2.2 · HARDWARE-VALIDATED RELEASE
-**Project:** `tkr-quantum` — a Rust crate plus a Python measurement layer
-**Central claim:** the TKR quantum bridge is neither simulated nor assumed. It was
+**Project:** `scs-quantum` — a Rust crate plus a Python measurement layer
+**Central claim:** the SCS quantum bridge is neither simulated nor assumed. It was
 measured on a real superconducting quantum processor.
 
 ---
@@ -35,17 +35,17 @@ to look alike.
 > disagree, the measurement is authoritative, and this document says so.
 >
 > The converse holds as well: the hardware measurements of §4 do **not** prove
-> that the complete TKR — every band, every layer, every parameter together —
+> that the complete SCS — every band, every layer, every parameter together —
 > works correctly. The hardware proof covers the bridge's *elementary gates*.
 
 ---
 
 ## 1. Abstract
 
-The Térkódoló Rendszer (TKR, "Spatial Encoding System") is a wave-based memory
-architecture in which data and code are not separated: the waveform itself
-carries both. The field (`Field`) is a paged, dynamically extensible memory area
-that stores **wave packets** (`WavePacket`):
+The Space Computing System (SCS) is a wave-based memory architecture in which
+data and code are not separated: the waveform itself carries both. The field
+(`Field`) is a paged, dynamically extensible memory area that stores **wave
+packets** (`WavePacket`):
 
 ```
 ψ(t) = A · exp(−γ·t) · cos(2π·f·t + φ)
@@ -473,7 +473,7 @@ decoding).
 | The two-chain `CNOT` (3 qubits) works | GHZ `000` = 49.20%, `111` = 47.60% |
 | The measurement floor is known | `zero` at 1/2/3 qubits: 98.25% / 98.70% / 97.40% |
 
-**What this does NOT prove:** that the complete TKR — every band, every layer,
+**What this does NOT prove:** that the complete SCS — every band, every layer,
 all three parameters together — works correctly. The hardware proof covers the
 bridge's **elementary gates**.
 
@@ -558,7 +558,7 @@ python -m python.tkr_ibm ghz  --shots 2000
 The token is supplied **exclusively via an environment variable**, never in a
 file. The `--local` mode is an ideal, local simulation: it verifies the code
 pipeline and asserts **nothing** about the hardware. Details:
-`TKR_QUANTUM_DESIGN.md`.
+`SCS_QUANTUM_DESIGN.md`.
 
 ---
 

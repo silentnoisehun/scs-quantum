@@ -1,8 +1,8 @@
 [package]
-name = "tkr-quantum"
+name = "scs-quantum"
 version = "0.2.0"
 edition = "2021"
-description = "TKR (Térkódoló Rendszer) hardverfüggetlen kvantumhíd: frekvencialapú WavePacket-kódolás és visszafejtés"
+description = "SCS (Space Computing System) hardverfüggetlen kvantumhíd: frekvencialapú WavePacket-kódolás és visszafejtés"
 license = "MIT"
 # A `readme` a crate könyvtárán BELÜL legyen: a `cargo package` a csomag
 # gyökeréből másol, ezért a "../README.md" útvonal ott nem található, és

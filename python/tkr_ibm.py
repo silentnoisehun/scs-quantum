@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-TKR — IBM Quantum backend (Qiskit Runtime).
+SCS — IBM Quantum backend (Qiskit Runtime).
 
-A TKR referencia-áramköreit valódi szupravezető QPU-n futtatja, és
+Az SCS referencia-áramköreit valódi szupravezető QPU-n futtatja, és
 mért bizonyítékot ad a hardveres validációhoz.
 
 MÉRT EREDMÉNYEK (2026.10.06, IBM `ibm_marrakesh`, 156 qubit, 2000 shots):
@@ -114,7 +114,7 @@ def _channel() -> str:
 def to_qiskit(spec: CircuitSpec, QuantumCircuit):
     """A hardverfüggetlen `CircuitSpec`-et Qiskit áramkörré alakítja.
 
-    A TKR-specifikus `CX` név a Qiskit `cx` kapujára képez le: a
+    A SCS-specifikus `CX` név a Qiskit `cx` kapujára képez le: a
     referencia-áramkörökben a kontroll az első, a cél a második kvantum,
     ami a szokásos `CNOT q[0], q[1]` jelentése.
 
@@ -177,7 +177,7 @@ class IbmRunner:
         except ImportError as e:
             raise IbmNotInstalled(
                 "qiskit / qiskit-ibm-runtime nincs telepítve: "
-                f"{e}\nTelepítés: pip install tkr-quantum[qpu]"
+                f"{e}\nTelepítés: pip install scs-quantum[qpu]"
             ) from e
 
         self.QuantumCircuit = QuantumCircuit
@@ -366,7 +366,7 @@ class IbmRunner:
 def main(argv=None) -> int:
     import argparse
     p = argparse.ArgumentParser(
-        prog="tkr-qpu", description="TKR — IBM Quantum validáció (Qiskit Runtime)")
+        prog="scs-qpu", description="SCS — IBM Quantum validáció (Qiskit Runtime)")
     p.add_argument("cmd", choices=sorted(LABELS) + ["devices"])
     p.add_argument("--backend", help="explicit backend name; "
                                      "alapértelmezés: least_busy")

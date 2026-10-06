@@ -1,4 +1,4 @@
-//! Tér-motor: a TKR 13×9 hullámtér lapokra osztott, dinamikus tárolója.
+//! Tér-motor: Az SCS 13×9 hullámtér lapokra osztott, dinamikus tárolója.
 //!
 //! A white paper v2.0 §5 "Tér-motor Rustban" pseudokódjának implementációja.
 //! A tér S₁₃ frekvenciasávból és D₉ mélységi rétegből áll; minden logikai sík
@@ -109,7 +109,7 @@ impl FieldPage {
     }
 }
 
-/// A TKR tér-motor: lapokra osztott hullámtár `S₁₃ × D₉` méretben.
+/// Az SCS tér-motor: lapokra osztott hullámtár `S₁₃ × D₉` méretben.
 #[derive(Debug, Clone)]
 pub struct FieldEngine {
     pages: Vec<FieldPage>,

@@ -27,6 +27,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "scs-quantum"
+version = "0.2.0"
+dependencies = [
+ "anyhow",
+ "serde",
+]
+
+[[package]]
 name = "serde"
 version = "1.0.229"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -65,14 +73,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
-]
-
-[[package]]
-name = "tkr-quantum"
-version = "0.2.0"
-dependencies = [
- "anyhow",
- "serde",
 ]
 
 [[package]]

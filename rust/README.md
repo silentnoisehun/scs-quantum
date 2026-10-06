@@ -1,6 +1,6 @@
-# tkr-quantum
+# scs-quantum
 
-TKR (Térkódoló Rendszer) — hardverfüggetlen kvantumhíd.
+SCS (Space Computing System) — hardverfüggetlen kvantumhíd.
 
 A crate a WavePacket frekvencialapú kódolását és visszafejtését tartalmazza,
 platformfüggetlen adatszerkezetekkel. Nem tartalmaz hálózati klienst vagy

@@ -1,4 +1,4 @@
-# TKR — Térkódoló Rendszer (Spatial Encoding System)
+# SCS — Space Computing System
 
 Frequency-domain wave-packet encoding with a quantum bridge **validated on real
 quantum hardware**.
@@ -8,16 +8,16 @@ quantum hardware**.
 > GHZ ideal (2000 shots, IBM `ibm_marrakesh`, 2026-10-06).
 
 **Hungarian:** [README in Hungarian](README.md) ·
-**Documents:** [White Paper (EN)](docs/TKR_WHITE_PAPER_v2.en.md) ·
-[White Paper (HU)](docs/TKR_WHITE_PAPER_v2.md) ·
-[Engineering Design (EN)](docs/TKR_QUANTUM_DESIGN.en.md) ·
-[Engineering Design (HU)](docs/TKR_QUANTUM_DESIGN.md)
+**Documents:** [White Paper (EN)](docs/SCS_WHITE_PAPER.en.md) ·
+[White Paper (HU)](docs/SCS_WHITE_PAPER.md) ·
+[Engineering Design (EN)](docs/SCS_QUANTUM_DESIGN.en.md) ·
+[Engineering Design (HU)](docs/SCS_QUANTUM_DESIGN.md)
 
 ---
 
 ## What this system is
 
-TKR decomposes a wave packet
+SCS decomposes a wave packet
 
 ```
 ψ(t) = A · exp(−γ·t) · cos(2π·f·t + φ)
@@ -33,8 +33,8 @@ The frequency-domain approach stores the state not in `N` qubits but in a
 ## Quick start
 
 ```bash
-git clone https://github.com/silentnoisehun/tkr-quantum
-cd tkr-quantum
+git clone https://github.com/silentnoisehun/scs-quantum
+cd scs-quantum
 
 # 1. Verify the classical layer (nothing to install)
 cd rust && cargo test --release && cd ..
@@ -44,7 +44,7 @@ python -m proofs.tkr_proofs
 python -m python.tkr_ibm bell --local --shots 2000
 
 # 3. Re-run the hardware evidence (token required)
-pip install "tkr-quantum[qpu]"
+pip install "scs-quantum[qpu]"
 export IBM_QUANTUM_API_TOKEN="..."
 python -m python.tkr_ibm devices
 python -m python.tkr_ibm bell --backend ibm_marrakesh --shots 2000
@@ -115,10 +115,10 @@ python/
 proofs/
   tkr_proofs.py          the 8 proof points, each with a status
 docs/
-  TKR_WHITE_PAPER_v2.md    white paper (Hungarian)
-  TKR_WHITE_PAPER_v2.en.md white paper (English)
-  TKR_QUANTUM_DESIGN.md    engineering document (Hungarian)
-  TKR_QUANTUM_DESIGN.en.md engineering document (English)
+  SCS_WHITE_PAPER.md        white paper (Hungarian)
+  SCS_WHITE_PAPER.en.md     white paper (English)
+  SCS_QUANTUM_DESIGN.md     engineering document (Hungarian)
+  SCS_QUANTUM_DESIGN.en.md  engineering document (English)
 config/.env.template     where environment variables go
 RELEASE.md               the DOI / Zenodo / arXiv release steps
 ```
@@ -173,14 +173,14 @@ does not pass.
 ## Citing this work
 
 ```bibtex
-@software{tkr_quantum_2026,
-  title  = {TKR: A Frequency-Domain Wave-Packet Encoding System
+@software{scs_quantum_2026,
+  title  = {SCS: A Frequency-Domain Wave-Packet Encoding System
             with a Hardware-Validated Quantum Bridge},
-  author = {{TKR contributors}},
+  author = {Máté Róbert},
   year   = {2026},
   version = {0.2.0},
   license = {MIT},
-  url    = {https://github.com/silentnoisehun/tkr-quantum},
+  url    = {https://github.com/silentnoisehun/scs-quantum},
   doi    = {10.5281/zenodo.XXXXXXX}   % the concept DOI, minted on Zenodo
 }
 ```

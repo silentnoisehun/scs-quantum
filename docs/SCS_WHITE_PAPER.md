@@ -1,10 +1,10 @@
-# A Térkódoló Rendszer (TKR)
+# A Space Computing System (SCS)
 
 ## White paper — a kvantumhíd hardveres validációval
 
 **Verzió:** 2.2 · HARDVERESEN VALIDÁLT KIADÁS
-**Projekt:** `tkr-quantum` — crate `tkr-quantum` (Rust) + mérési réteg (Python)
-**Központi állítás:** a TKR kvantumhídja nem szimulált és nem feltételezett, hanem
+**Projekt:** `scs-quantum` — crate `scs-quantum` (Rust) + mérési réteg (Python)
+**Központi állítás:** az SCS kvantumhídja nem szimulált és nem feltételezett, hanem
 valódi szupravezető kvantumprocesszoron mért.
 
 ---
@@ -35,14 +35,14 @@ A jelölések nem díszek: két különböző minőségű állítást soha nem s
 > mérvadó, és ezt a dokumentum ki is mondja.
 >
 > Ugyanez fordítva is igaz: a §4 szerinti hardveres mérések **nem** bizonyítják,
-> hogy a teljes TKR — minden sáv, minden réteg, minden paraméter együtt —
+> hogy a teljes SCS — minden sáv, minden réteg, minden paraméter együtt —
 > helyesen működik. A hardveres bizonyíték a híd *alapkapuira* vonatkozik.
 
 ---
 
 ## 1. Absztrakt
 
-A Térkódoló Rendszer (TKR) egy hullám-alapú memóriaarchitektúra, amelyben nem az
+A Space Computing System (SCS) egy hullám-alapú memóriaarchitektúra, amelyben nem az
 adat és a kód válik szét, hanem maga a hullámforma hordozza mindkettőt. A
 tér (`Field`) egy lapokra osztott, dinamikusan bővíthető memória-mező, amely
 **hullámcsomagokat** (`WavePacket`) tárol:
@@ -195,7 +195,7 @@ A tárolás **bit-pontos** ✅ **BIZONYÍTVA (klasszikus)**: `write_wave`, majd
 stabil mélységre igaz. A sávszám és a mélység ellenőrzése része a szerződésnek
 (a 13. sáv és a 10. réteg elutasítva).
 
-A FieldEngine ma **önállóan is teljes értékű komponens**: a TKR kvantumoldali
+A FieldEngine ma **önállóan is teljes értékű komponens**: az SCS kvantumoldali
 része nélkül is használható, és a rendszer felső szintű működését nem
 függteti a híd sikerétől vagy kudarcától.
 
@@ -468,7 +468,7 @@ visszafejtés).
 | A kétláncú `CNOT` (3 kvantum) működik | GHZ `000` = 49,20%, `111` = 47,60% |
 | A mérési alapszint ismert | `zero` 1/2/3 kvantumon: 98,25% / 98,70% / 97,40% |
 
-**Amit ez NEM bizonyít:** hogy a teljes TKR — minden sávval, minden réteggel,
+**Amit ez NEM bizonyít:** hogy a teljes SCS — minden sávval, minden réteggel,
 mindhárom paraméterrel együtt — helyesen működik. A hardveres bizonyíték a
 híd **alapkapuira** vonatkozik.
 
@@ -552,7 +552,7 @@ python -m python.tkr_ibm ghz   --shots 2000
 
 A token **kizárólag környezeti változóban** adható át, soha nem fájlban.
 A `--local` mód ideális, helyi szimuláció: a kód pipeline-ját ellenőrzi, a
-hardverről **semmit** nem állít. A részletek: `docs/TKR_QUANTUM_DESIGN.md`.
+hardverről **semmit** nem állít. A részletek: `docs/SCS_QUANTUM_DESIGN.md`.
 
 ---
 

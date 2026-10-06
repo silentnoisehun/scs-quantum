@@ -1,8 +1,8 @@
-# The TKR Quantum Bridge — Engineering Design Document
+# The SCS Quantum Bridge — Engineering Design Document
 
-**Audience:** anyone modifying the `tkr-quantum` crate or the Python measurement
+**Audience:** anyone modifying the `scs-quantum` crate or the Python measurement
 layer, or adding a new quantum-hardware backend.
-**Companion document:** `TKR_WHITE_PAPER_v2.en.md` (the scientific claims and the
+**Companion document:** `SCS_WHITE_PAPER.en.md` (the scientific claims and the
 hardware validation).
 
 ---
@@ -196,11 +196,11 @@ of the key order — see §5.
 
 ### 4.5 The meaning of two-qubit direction
 
-The TKR-specific `CX` lowers to Qiskit's `cx`, and **the first qubit is the
+The SCS-specific `CX` lowers to Qiskit's `cx`, and **the first qubit is the
 control, the second is the target**. `CNOT` is an alias of `cx`, so the
-TKR-specific `CNOT` name and the Qiskit-level `cx(control, target)` meaning agree.
+SCS-specific `CNOT` name and the Qiskit-level `cx(control, target)` meaning agree.
 
-TKR's frequency and phase encoding uses `CNOT` in the **`q[1]` → `q[0]`**
+SCS's frequency and phase encoding uses `CNOT` in the **`q[1]` → `q[0]`**
 direction: the control (`q[1]`) carries the parameter, and the target (`q[0]`) is
 the clean reference. The `interference_circuits_keep_reference_qubit_at_zero`
 test pins that `q[0]` receives no `RY`, so it genuinely remains a reference. ✅
@@ -275,7 +275,7 @@ The `tkr_measure.py` module docstring says this explicitly.
 
 ## 6. The reference circuits
 
-The references are **not** TKR encodings. They are the hardware's measuring
+The references are **not** SCS encodings. They are the hardware's measuring
 instruments: every reference has a **known expected outcome**, and if the hardware
 does not produce it, the fault is in the hardware or in the measurement path.
 

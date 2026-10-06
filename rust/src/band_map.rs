@@ -174,7 +174,7 @@ pub fn packets_per_plane() -> usize {
 /// `within ∈ [0.0, 1.0)` esetén zárt.
 pub fn band_of_wave(wave: &WavePacket) -> Band {
     // A normált frekvencia: a 0.0 referencia 0 Hz, az 1.0 a Nyquist-fél.
-    // A TKR-ben a frekvenciahordozó 0 és 0.5 közé esik.
+    // A SCS-ben a frekvenciahordozó 0 és 0.5 közé esik.
     let norm = (wave.frequency / 2.0).clamp(0.0, 1.0);
     Band::of_frequency(norm)
 }

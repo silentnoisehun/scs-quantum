@@ -1,4 +1,4 @@
-//! TKR psi-quantum híd: WavePacket → kvantumáramkör kódolás.
+//! SCS psi-quantum híd: WavePacket → kvantumáramkör kódolás.
 //!
 //! Ez a modul HARDVERFÜGGETLEN. Nem tartalmaz gyártótól függő kódot:
 //! sem hálózati klienst, sem eszközazonosítót. A kimenete egy
@@ -22,7 +22,7 @@
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
-/// TKR hullámcsomag: psi(t) = A * exp(-gamma*t) * cos(2*pi*f*t + phi)
+/// SCS hullámcsomag: psi(t) = A * exp(-gamma*t) * cos(2*pi*f*t + phi)
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct WavePacket {
@@ -101,7 +101,7 @@ impl CircuitSpec {
     }
 }
 
-/// A TKR kétkvantumos kódolásához szükséges kvantumok száma.
+/// Az SCS kétkvantumos kódolásához szükséges kvantumok száma.
 ///
 /// A három paraméter (A, f, φ) paraméterenként külön kísérletben
 /// mérhető, így nem kell egyszerre három kvantum.
@@ -135,7 +135,7 @@ fn p_of_q0_zero(counts: &Counts) -> Result<f64> {
     Ok(counts.get("0x0").copied().unwrap_or(0) as f64 / total as f64)
 }
 
-/// TKR → kvantumáramkör kódolás.
+/// SCS → kvantumáramkör kódolás.
 #[derive(Debug, Default, Clone)]
 pub struct PsiQuantumBridge {
     /// Hány kvantumot használ a kódolás.

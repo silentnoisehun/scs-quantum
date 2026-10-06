@@ -1,4 +1,4 @@
-# TKR — CI
+# SCS — CI
 #
 # A cél: minden kiadáskor bizonyítani, hogy a KLASZIKUS réteg zöld, és hogy
 # a hardverfüggetlen mérési réteg importálható Qiskit nélkül.
@@ -6,7 +6,7 @@
 # 🧬 A CI NEM futtat QPU-mérést. A `--local` mód ellenőrzi a mérési pipeline-t
 # IDEÁLIS szimulációban, ami a KÓD helyességét igazolja — a HARDVERről semmit
 # nem állít. A hardveres bizonyíték a `python -m python.tkr_ibm` valódi QPU-futtatás,
-# kézzel, a saját IBM tokenjükkel (lásd docs/TKR_WHITE_PAPER_v2.md §4).
+# kézzel, a saját IBM tokenjükkel (lásd docs/SCS_WHITE_PAPER.md §4).
 
 name: CI
 

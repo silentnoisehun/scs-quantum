@@ -1,10 +1,10 @@
-# TKR — Release workflow
+# SCS — Release workflow
 #
 # Publikálja a Python csomagot a PyPI-ra és a Rust crate-et a crates.io-ra,
 # GitHub Release formájában, a release-ekhez csatolva a sdist + wheel.
 #
 # 🧬 A HARDVERES BIZONYÍTÉK NEM FUT itt: QPU-méréshez valódi IBM token kell,
-# ezért kézzel történik (docs/TKR_WHITE_PAPER_v2.md §4). Ez a workflow a
+# ezért kézzel történik (docs/SCS_WHITE_PAPER.md §4). Ez a workflow a
 # KLASSZIKUS bizonyítékot archiválja: a 36 zöld Rust teszt + a proofs.
 
 name: Release
@@ -56,7 +56,7 @@ jobs:
           twine check dist/*
           tar -tzf dist/*.tar.gz | grep -q 'rust/src/psi_quantum.rs' \
             || { echo "::error::sdist is missing the Rust sources"; exit 1; }
-          tar -tzf dist/*.tar.gz | grep -q 'docs/TKR_WHITE_PAPER_v2.md' \
+          tar -tzf dist/*.tar.gz | grep -q 'docs/SCS_WHITE_PAPER.md' \
             || { echo "::error::sdist is missing the white paper"; exit 1; }
           echo "sdist contents OK"
 

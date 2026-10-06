@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-TKR — közös mérési és kódolási réteg (hardverfüggetlen).
+SCS — közös mérési és kódolási réteg (hardverfüggetlen).
 
 Ez a modul NEM tartalmaz gyártótól függő kódot: egyetlen kvantumszállító
 vagy hálózati réteget sem. Kizárólag azokat a részeket tartalmazza,
 amelyek MINDEN kvantumhardverrel érvényesek, és amelyek a QPU-mérések
 értelmezéséhez kellenek:
 
-  - `WavePacket`      — a TKR hullámcsomag (A, γ, f, φ)
+  - `WavePacket`      — Az SCS hullámcsomag (A, γ, f, φ)
   - `CircuitSpec`      — hardverfüggetlen áramkör-leírás
   - `counts_to_keys` — bitstring → `{"0x..": db}` forma
   - `bit_order_selfcheck` — a bit-sorrend IGAZOLÁSA méréssel
@@ -37,12 +37,12 @@ Counts = Dict[str, int]
 
 
 # --------------------------------------------------------------------------
-# A TKR hullámcsomag
+# Az SCS hullámcsomag
 # --------------------------------------------------------------------------
 
 @dataclass
 class WavePacket:
-    """TKR WavePacket: psi(t) = A * exp(-gamma*t) * cos(2*pi*f*t + phi)"""
+    """SCS WavePacket: psi(t) = A * exp(-gamma*t) * cos(2*pi*f*t + phi)"""
 
     amplitude: float    # A - intenzitás
     gamma: float        # γ - csillapítás
@@ -109,7 +109,7 @@ class CircuitSpec:
 # Referencia-áramkörök — a QPU-validáció mérőszerszámai
 # --------------------------------------------------------------------------
 #
-# Ezek NEM a TKR kódolás, hanem a HARDVER referenciamérései. Egy
+# Ezek NEM Az SCS kódolás, hanem a HARDVER referenciamérései. Egy
 # referencia-áramkör ismert elvárt eredménnyel rendelkezik; ha a
 # hardver nem adja, a hiba a hardverben (vagy a mérési útban) van.
 #

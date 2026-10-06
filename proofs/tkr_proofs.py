@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-TKR — bizonyítások.
+SCS — bizonyítások.
 
-Ez a fájl a TKR állításait mutatja be, MINDEN pontnál megjelölve, hogy
+Ez a fájl Az SCS állításait mutatja be, MINDEN pontnál megjelölve, hogy
 mérés igazolja-e, vagy csak feltételezés.
 
 FUTTATÁS:
@@ -239,7 +239,7 @@ def proof_5_hardware_validation():
 
     ✅✅ BIZONYÍTVA VALÓDI QPU-N.
 
-    Ez az egyetlen pont, ahol a TKR kvantumhídjának HARDVERES működése
+    Ez az egyetlen pont, ahol Az SCS kvantumhídjának HARDVERES működése
     igazolódik. A mérés: valódi 156 qubites szupravezető QPU
     (IBM `ibm_marrakesh`), 2000 shots/db.
     """
@@ -349,7 +349,7 @@ def proof_7_measurement_methodology():
     """
     BIZONYÍTÁS 7: a mérési módszertan — amit KÉT korábbi hiba tanított
 
-    Ez a pont nem a TKR-ről szól, hanem arról, hogyan mérünk biztonságosan.
+    Ez a pont nem az SCS-ről szól, hanem arról, hogyan mérünk biztonságosan.
     Mindkét szabály egy-egy kimutatott hibából származik.
     """
     print("\n" + "=" * 66)
@@ -425,7 +425,7 @@ def proof_8_o1_routing():
 
 def run_all_proofs():
     print("\n" + "#" * 66)
-    print("# TKR BIZONYÍTÁSOK")
+    print("# SCS BIZONYÍTÁSOK")
     print("#" * 66)
 
     proof_1_wave_packet_roundtrip()

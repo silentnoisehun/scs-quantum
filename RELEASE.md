@@ -1,4 +1,4 @@
-# RELEASE.md — how TKR gets a DOI
+# RELEASE.md — how SCS gets a DOI
 
 **Read this before tagging a release.** The order matters: Zenodo mints the DOI,
 and arXiv mints an identifier that should be cited *in* the Zenodo record, so the
@@ -19,11 +19,11 @@ two interact.
 > - Does every listed person **agree** to be named? (Being named on a DOI is a
 >   public, citable attribution, not a private favour.)
 
-The current placeholder in `CITATION.cff` is `TKR contributors`, deliberately
-chosen so that **no unconsented person is named**. Replace it with real names
-**only** when they have agreed. The same rule applies to the repository URL: the
-`example.invalid` placeholder is reserved by RFC 2606 and can never resolve, so
-nothing currently points at a fake-looking location that does not exist.
+The author in `CITATION.cff` is `Máté Róbert`, confirmed by the project owner.
+Anyone added to that list later must **agree** to be named: a DOI is a public,
+citable attribution, not a private favour. The repository URL is no longer a
+placeholder — `https://github.com/silentnoisehun/scs-quantum` is the real public
+location, so confirm it resolves before the Zenodo upload.
 
 ---
 
@@ -41,7 +41,7 @@ nothing currently points at a fake-looking location that does not exist.
 
 ## 2. Set the real URLs first
 
-Three files currently hold `https://example.invalid/tkr-quantum` placeholders.
+Three files currently hold `https://github.com/silentnoisehun/scs-quantum` placeholders.
 Replace them **before** publishing:
 
 | File | Field |
@@ -51,7 +51,7 @@ Replace them **before** publishing:
 | `README.md` | the `git clone <repo-url>` line |
 | `CHANGELOG.md` | the `[Unreleased]` and `[0.2.0]` link definitions at the bottom |
 
-The intended repository is `https://github.com/silentnoisehun/tkr-quantum`.
+The intended repository is `https://github.com/silentnoisehun/scs-quantum`.
 
 ---
 
@@ -59,8 +59,8 @@ The intended repository is `https://github.com/silentnoisehun/tkr-quantum`.
 
 ```powershell
 # 1. Make sure everything is committed and green
-cd C:\path\to\tkr_wukong
-git tag -a v0.2.0 -m "TKR 0.2.0 — hardware-validated quantum bridge"
+cd C:\path\to\scs_quantum
+git tag -a v0.2.0 -m "SCS 0.2.0 — hardware-validated quantum bridge"
 git push origin v0.2.0
 ```
 
@@ -79,10 +79,10 @@ be configured once on PyPI, otherwise the publish step fails with
 `missing or insufficient OIDC token permissions`.
 
 1. Create the project on <https://pypi.org/manage/account/publishing/> (or
-   claim the name `tkr-quantum` if it is available).
+   claim the name `scs-quantum` if it is available).
 2. Add a **pending publisher** on the project page:
    - **Owner:** `silentnoisehun`
-   - **Repository:** `tkr-quantum`
+   - **Repository:** `scs-quantum`
    - **Workflow name:** `release.yml`
    - **Environment:** *(leave empty)*
 
@@ -98,7 +98,7 @@ crates.io has no equivalent of OIDC trusted publishing.
 
 > 🧬 **What the release workflow does NOT do:** it does not run a QPU measurement.
 > That requires your own IBM token and is done by hand
-> (`docs/TKR_WHITE_PAPER_v2.md` §4). The release archives the *classical* proof;
+> (`docs/SCS_WHITE_PAPER.md` §4). The release archives the *classical* proof;
 > the hardware proof lives in the paper and in the Zenodo record.
 
 ---
@@ -109,7 +109,7 @@ crates.io has no equivalent of OIDC trusted publishing.
 
 1. Go to <https://zenodo.org> → sign in with your GitHub account.
 2. **New upload** → *GitHub* tab.
-3. Pick `silentnoisehun/tkr-quantum`.
+3. Pick `silentnoisehun/scs-quantum`.
 4. Enable **"Enable repository"** → Zenodo now snapshots every release you push.
 
 ### 4.2 Configure the metadata template
@@ -134,12 +134,12 @@ python -m build
 
 Upload at minimum:
 
-- `dist/tkr_quantum-0.2.0-py3-none-any.whl` (the installable package)
-- `dist/tkr_quantum-0.2.0.tar.gz` (the sdist, which contains the Rust crate)
+- `dist/scs_quantum-0.2.0-py3-none-any.whl` (the installable package)
+- `dist/scs_quantum-0.2.0.tar.gz` (the sdist, which contains the Rust crate)
 
 Optionally also:
 
-- `docs/TKR_WHITE_PAPER_v2.md` and `docs/TKR_WHITE_PAPER_v2.en.md` as
+- `docs/SCS_WHITE_PAPER.md` and `docs/SCS_WHITE_PAPER.en.md` as
   supplementary files,
 - a tarball of the exact tagged source tree.
 
@@ -184,7 +184,7 @@ arXiv wants **LaTeX**, not Markdown. Two paths:
 Minimal conversion:
 
 ```powershell
-pandoc docs/TKR_WHITE_PAPER_v2.en.md -o arxiv/tkr-quantum.tex --standalone
+pandoc docs/SCS_WHITE_PAPER.en.md -o arxiv/scs-quantum.tex --standalone
 ```
 
 > ⚠️ **arXiv requires at least one author with an institutional email address.**
@@ -250,5 +250,5 @@ Zenodo record. Zenodo lets you edit a published record's description.
 
 *`cargo test --release` → 36 passed, 0 failed is the **classical** proof. It is
 archived by the release workflow. The **hardware** proof is the QPU measurement in
-`docs/TKR_WHITE_PAPER_v2.md` §4, recorded in the Zenodo provenance. The two are
+`docs/SCS_WHITE_PAPER.md` §4, recorded in the Zenodo provenance. The two are
 never the same thing.*

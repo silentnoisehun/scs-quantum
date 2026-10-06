@@ -1,4 +1,4 @@
-//! TKR (Térkódoló Rendszer) kvantum híd.
+//! SCS (Space Computing System) kvantum híd.
 //!
 //! A csomag két hardverfüggetlen réteget tartalmaz:
 //!

@@ -1,8 +1,8 @@
-# A TKR kvantumhíd — mérnöki tervezési dokumentum
+# Az SCS kvantumhíd — mérnöki tervezési dokumentum
 
-**Célközönség:** aki a `tkr-quantum` crate-et és a Python mérési réteget
+**Célközönség:** aki a `scs-quantum` crate-et és a Python mérési réteget
 módosítja, illetve új kvantumhardver-backendet akar hozzáadni.
-**Kapcsolódó dokumentum:** `TKR_WHITE_PAPER_v2.md` (a tudományos állítások
+**Kapcsolódó dokumentum:** `SCS_WHITE_PAPER.md` (a tudományos állítások
 és a hardveres validáció).
 
 ---
@@ -196,11 +196,11 @@ A `c[i] = q[i]` párosítás ℹ️ **KONVENCIÓ**, és a kulcssorrend értelmez
 
 ### 4.5 A kétkvantumos kapu irányának jelentése
 
-A TKR-specifikus `CX` a Qiskit `cx`-re képez le, és **az első kvantum a
-kontroll, a második a cél**. A `CNOT` az `cx` aliasa, így a TKR-specifikus
+Az SCS-specifikus `CX` a Qiskit `cx`-re képez le, és **az első kvantum a
+kontroll, a második a cél**. A `CNOT` az `cx` aliasa, így Az SCS-specifikus
 `CNOT` név és a Qiskit-szintű `cx(control, target)` jelentése egyezik.
 
-A TKR frekvencia- és fáziskódolása `CNOT`-ot használ **`q[1]` → `q[0]`
+Az SCS frekvencia- és fáziskódolása `CNOT`-ot használ **`q[1]` → `q[0]`
 irányban**: a vezérlő (`q[1]`) hordozza a paramétert, a cél (`q[0]`) a tiszta
 referencia. A `interference_circuits_keep_reference_qubit_at_zero` teszt
 rögzíti, hogy a `q[0]` nem kap `RY`-t, tehát valóban referencia marad. ✅
@@ -277,7 +277,7 @@ explicit meg is írja.
 
 ## 6. A referencia-áramkörök
 
-A referenciák **nem** a TKR kódolásai. Ők a hardver mérőszerszámai: minden
+A referenciák **nem** az SCS kódolásai. Ők a hardver mérőszerszámai: minden
 referenciának **ismert elvárt eredménye** van, és ha a hardver nem adja, a
 hiba a hardverben vagy a mérési útban van.
 

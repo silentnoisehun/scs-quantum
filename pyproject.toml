@@ -7,9 +7,9 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tkr-quantum"
+name = "scs-quantum"
 version = "0.2.0"
-description = "TKR (Spatial Encoding System): frequency-domain WavePacket encoding with a hardware-validated quantum bridge"
+description = "SCS (Space Computing System): frequency-domain WavePacket encoding with a hardware-validated quantum bridge"
 # The PyPI landing page is read by an international audience first, so the
 # English README is the package long_description. The Hungarian one stays in
 # the repo (README.md) and in the sdist.
@@ -37,7 +37,7 @@ dependencies = []
 license = "MIT"
 license-files = ["LICENSE"]
 
-authors = [{ name = "TKR contributors" }]
+authors = [{ name = "Máté Róbert" }]
 keywords = [
     "quantum",
     "encoding",
@@ -68,11 +68,11 @@ dev = ["qiskit>=2.0", "qiskit-ibm-runtime>=0.40", "python-dotenv>=1.0"]
 # release workflow's sdist check and the Zenodo record both depend on it.
 # The DOI is minted by Zenodo; see RELEASE.md §4 for the concept-vs-version
 # distinction and which one belongs here.
-Homepage = "https://github.com/silentnoisehun/tkr-quantum"
-Repository = "https://github.com/silentnoisehun/tkr-quantum"
-Documentation = "https://github.com/silentnoisehun/tkr-quantum/tree/main/docs"
-"Bug Tracker" = "https://github.com/silentnoisehun/tkr-quantum/issues"
-Changelog = "https://github.com/silentnoisehun/tkr-quantum/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/silentnoisehun/scs-quantum"
+Repository = "https://github.com/silentnoisehun/scs-quantum"
+Documentation = "https://github.com/silentnoisehun/scs-quantum/tree/main/docs"
+"Bug Tracker" = "https://github.com/silentnoisehun/scs-quantum/issues"
+Changelog = "https://github.com/silentnoisehun/scs-quantum/blob/main/CHANGELOG.md"
 
 # 🧬 A DOI ŐRYEKETŐJEL a koncept DOI, amit a Zenodo ad a kiadáskor. Amíg nincs,
 # a pontos DOI-értéket a CITATION.cff és a README birtokolja; a PyPI-csomag
@@ -82,7 +82,11 @@ Changelog = "https://github.com/silentnoisehun/tkr-quantum/blob/main/CHANGELOG.m
 [project.scripts]
 # Module-level entry point. `python/tkr_ibm.py` has `main(argv=None) -> int`,
 # so returning the int from main() is what makes the shell exit code correct.
-tkr-qpu = "python.tkr_ibm:main"
+scs-qpu = "python.tkr_ibm:main"
+# 🧬 Az ENTRY POINT MODULNEVE (`python.tkr_ibm`) SZANDÉKOSAN változatlan: a
+# modulok átnevezése breaking change lenne a `python -m python.tkr_ibm`
+# invokációkra. Ha kesobb a modul is SCS-vez lesz, a script nevet EGYUTT kell
+# atnevezni a `[tool.setuptools]` es a dokumentacio szinkronban.
 
 [tool.setuptools.packages.find]
 # `python/` and `proofs/` are PEP 420 implicit namespace packages: they
@@ -115,11 +119,11 @@ where = ["."]
 include = ["python*", "proofs*"]
 namespaces = true
 
-[tool.tkr]
+[tool.scs]
 # Minimal machine-readable metadata for the project's own tooling. Kept
 # separate from `[project]` so it never leaks into the published distribution
 # metadata (unknown top-level tables are not forwarded by the PEP 621 backend).
-crate = "tkr-quantum"       # must stay in sync with rust/Cargo.toml [package].name
+crate = "scs-quantum"       # must stay in sync with rust/Cargo.toml [package].name
 hardware_validated = true
 reference_backend = "IBM Quantum"
 reference_device = "ibm_marrakesh"   # 156-qubit superconducting QPU

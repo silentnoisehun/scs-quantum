@@ -1,4 +1,4 @@
-# TKR — Térkódoló Rendszer
+# SCS — Space Computing System
 
 Frekvencialapú hullámcsomag-kódolás, **valódi kvantumhardveren igazolt** kvantumhíddal.
 
@@ -7,16 +7,16 @@ Frekvencialapú hullámcsomag-kódolás, **valódi kvantumhardveren igazolt** kv
 > **99,3%**, a GHZ ideális (2000 shots, IBM `ibm_marrakesh`, 2026.10.06).
 
 **English:** [README in English](README.en.md) ·
-**Dokumentumok:** [White Paper (HU)](docs/TKR_WHITE_PAPER_v2.md) ·
-[White Paper (EN)](docs/TKR_WHITE_PAPER_v2.en.md) ·
-[Mérnöki terv (HU)](docs/TKR_QUANTUM_DESIGN.md) ·
-[Engineering Design (EN)](docs/TKR_QUANTUM_DESIGN.en.md)
+**Dokumentumok:** [White Paper (HU)](docs/SCS_WHITE_PAPER.md) ·
+[White Paper (EN)](docs/SCS_WHITE_PAPER.en.md) ·
+[Mérnöki terv (HU)](docs/SCS_QUANTUM_DESIGN.md) ·
+[Engineering Design (EN)](docs/SCS_QUANTUM_DESIGN.en.md)
 
 ---
 
 ## Mi ez a rendszer
 
-A TKR egy hullámcsomagot
+Az SCS egy hullámcsomagot
 
 ```
 ψ(t) = A · exp(−γ·t) · cos(2π·f·t + φ)
@@ -33,8 +33,8 @@ A frekvencialapú megközelítés az állapotot nem `N` kvantumban, hanem
 ## Gyors indítás
 
 ```bash
-git clone <repo-url> tkr-quantum
-cd tkr-quantum
+git clone https://github.com/silentnoisehun/scs-quantum
+cd scs-quantum
 
 # 1. A klasszikus réteg ellenőrzése (nincs semmi telepítendő)
 cd rust && cargo test --release && cd ..
@@ -44,7 +44,7 @@ python -m proofs.tkr_proofs
 python -m python.tkr_ibm bell --local --shots 2000
 
 # 3. A hardveres bizonyíték újrafuttatása (token kell)
-pip install "tkr-quantum[qpu]"
+pip install "scs-quantum[qpu]"
 export IBM_QUANTUM_API_TOKEN="..."
 python -m python.tkr_ibm devices
 python -m python.tkr_ibm bell --backend ibm_marrakesh --shots 2000
@@ -114,10 +114,10 @@ python/
 proofs/
   tkr_proofs.py          a 8 bizonyítási pont, mindegyik státusszal
 docs/
-  TKR_WHITE_PAPER_v2.md    white paper (magyar)
-  TKR_WHITE_PAPER_v2.en.md white paper (English)
-  TKR_QUANTUM_DESIGN.md    mérnöki dokumentum (magyar)
-  TKR_QUANTUM_DESIGN.en.md engineering design (English)
+  SCS_WHITE_PAPER.md        white paper (magyar)
+  SCS_WHITE_PAPER.en.md     white paper (English)
+  SCS_QUANTUM_DESIGN.md     mérnöki dokumentum (magyar)
+  SCS_QUANTUM_DESIGN.en.md  engineering design (English)
 config/.env.template     környezeti változók helye
 RELEASE.md               a DOI / Zenodo / arXiv kiadás lépései
 ```
