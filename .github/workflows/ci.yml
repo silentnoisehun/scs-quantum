@@ -32,7 +32,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - name: Run the test suite
-        run: cargo test --release --locked --workspace
+        working-directory: rust
+        run: cargo test --release --locked
         # 🧬 A 36 teszt a KLASSZIKUS szoftver helyességét igazolja.
         # Nem hardveres bizonyíték. A zöld eredmény NEM jelent QPU-mérést.
 
