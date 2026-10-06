@@ -1,0 +1,39 @@
+# Source distribution contents (sdist).
+#
+# Python modules under python/ and proofs/ are added automatically by
+# setuptools because they are discovered as namespace packages (see
+# pyproject.toml -> [tool.setuptools.packages.find]). Everything listed below
+# is NON-Python material that a source archive would otherwise drop.
+
+include LICENSE
+include README.md
+include README.en.md
+include CITATION.cff
+include CHANGELOG.md
+include RELEASE.md
+
+# Both languages of both documents travel with the sdist: the paper is the
+# primary scientific artefact, and a reader must not need the repository to
+# read the claims and their proof grades.
+include docs/*.md
+
+# The Rust half of the project is part of the same release: a user who gets the
+# sdist must be able to rebuild the crate, so Cargo.toml and the sources travel
+# with it.
+include rust/Cargo.toml
+include rust/src/*.rs
+
+# Exclusions. rust/target is build output (multi-gigabyte), __pycache__ is
+# regenerable bytecode, and .env may hold a real IBM credential.
+exclude rust/target
+exclude .env
+exclude .env.*
+recursive-exclude rust/target *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[cod]
+global-exclude .DS_Store
+
+# Re-include the template LAST: in MANIFEST.in a later directive wins for the
+# same path, so the `exclude .env.*` above would otherwise drop
+# config/.env.template. The template is safe to ship — placeholders only.
+include config/.env.template

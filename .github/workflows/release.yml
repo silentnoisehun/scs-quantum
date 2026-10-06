@@ -1,0 +1,99 @@
+# TKR — Release workflow
+#
+# Publikálja a Python csomagot a PyPI-ra és a Rust crate-et a crates.io-ra,
+# GitHub Release formájában, a release-ekhez csatolva a sdist + wheel.
+#
+# 🧬 A HARDVERES BIZONYÍTÉK NEM FUT itt: QPU-méréshez valódi IBM token kell,
+# ezért kézzel történik (docs/TKR_WHITE_PAPER_v2.md §4). Ez a workflow a
+# KLASSZIKUS bizonyítékot archiválja: a 36 zöld Rust teszt + a proofs.
+
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build and verify, but do not publish'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    name: Verify before publishing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Rust tests must be green
+        working-directory: rust
+        run: cargo test --release --locked
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Proofs must pass
+        run: python -m proofs.tkr_proofs
+
+      - name: Build sdist and wheel
+        run: |
+          pip install --upgrade build
+          python -m build
+
+      - name: Check the sdist contents
+        # The Rust half must travel with the sdist: a user who gets the sdist
+        # must be able to rebuild the crate.
+        run: |
+          pip install --upgrade twine
+          twine check dist/*
+          tar -tzf dist/*.tar.gz | grep -q 'rust/src/psi_quantum.rs' \
+            || { echo "::error::sdist is missing the Rust sources"; exit 1; }
+          tar -tzf dist/*.tar.gz | grep -q 'docs/TKR_WHITE_PAPER_v2.md' \
+            || { echo "::error::sdist is missing the white paper"; exit 1; }
+          echo "sdist contents OK"
+
+      - name: Rust crate check
+        working-directory: rust
+        run: cargo package --list --allow-dirty | head -50
+
+  publish:
+    name: Publish
+    needs: verify
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+      - name: Publish the crate to crates.io
+        run: |
+          cargo install cargo-release --locked
+          cd rust
+          cargo login --token "${{ secrets.CARGO_REGISTRY_TOKEN }}"
+          cargo publish
+
+      - name: Create the GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.tar.gz
+            dist/*.whl
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

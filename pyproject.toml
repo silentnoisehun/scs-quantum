@@ -1,0 +1,126 @@
+[build-system]
+# setuptools only. No wheel-specific config is needed: setuptools >= 61 can
+# build a PEP 517 wheel on its own, and >= 61 is also the first release that
+# understands every field used below (PEP 621 `[project]` + namespace package
+# discovery via `[tool.setuptools.packages.find]`).
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tkr-quantum"
+version = "0.2.0"
+description = "TKR (Spatial Encoding System): frequency-domain WavePacket encoding with a hardware-validated quantum bridge"
+# The PyPI landing page is read by an international audience first, so the
+# English README is the package long_description. The Hungarian one stays in
+# the repo (README.md) and in the sdist.
+readme = "README.en.md"
+requires-python = ">=3.9"
+
+# `python/tkr_measure.py` and `proofs/tkr_proofs.py` import the standard library
+# ONLY (sys, dataclasses, typing, math, os). Keeping `dependencies` empty is a
+# deliberate contract, not an omission:
+#   * the measurement layer must be importable on any machine, including inside
+#     a locked-down analysis container with no network access;
+#   * qiskit pins a narrow Python range and pulls a large transitive tree, which
+#     would make the pure measurement code unusable for people who only want to
+#     read counts;
+#   * qiskit is therefore an OPTIONAL extra (see `optional-dependencies`), and
+#     `python/tkr_ibm.py` imports it lazily inside functions so that the module
+#     still imports and `--help` works without it.
+dependencies = []
+
+# PEP 639 licencforma (a `license = "MIT"` SPDX-forma). Ez a modern alak:
+# a régi `license = { text = "MIT" }` + `License ::` klasszifikátor
+# 2027-07-18-ig támogatott, de azóra DEPRECATED. Mivel a 0.2.0 még nem
+# jelent meg, mostantól PEP 639 szerint adjuk meg, és kivenjük a
+# klasszifikátort, amit a PEP 639 már tilt.
+license = "MIT"
+license-files = ["LICENSE"]
+
+authors = [{ name = "TKR contributors" }]
+keywords = [
+    "quantum",
+    "encoding",
+    "wave-packet",
+    "interference",
+    "frequency-domain",
+]
+# 🧬 A "License :: OSI Approved :: MIT License" KLASZTIKÁTOR NEM lehet itt:
+# a PEP 639 szerint licencet csak a `license` mező adhat meg, a
+# klasszifikátorral együtt dupla deklaráció lenne.
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.optional-dependencies]
+# Real hardware (QPU) runs: transpilation, primitives and IBM Runtime session.
+qpu = ["qiskit>=2.0", "qiskit-ibm-runtime>=0.40"]
+# `dev` additionally pulls python-dotenv so `config/.env` style local setup works.
+# Note it is still OPTIONAL: tkr_ibm.py guards the dotenv import with try/except.
+dev = ["qiskit>=2.0", "qiskit-ibm-runtime>=0.40", "python-dotenv>=1.0"]
+
+[project.urls]
+# The public repository. Before a real release, confirm this resolves — the
+# release workflow's sdist check and the Zenodo record both depend on it.
+# The DOI is minted by Zenodo; see RELEASE.md §4 for the concept-vs-version
+# distinction and which one belongs here.
+Homepage = "https://github.com/silentnoisehun/tkr-quantum"
+Repository = "https://github.com/silentnoisehun/tkr-quantum"
+Documentation = "https://github.com/silentnoisehun/tkr-quantum/tree/main/docs"
+"Bug Tracker" = "https://github.com/silentnoisehun/tkr-quantum/issues"
+Changelog = "https://github.com/silentnoisehun/tkr-quantum/blob/main/CHANGELOG.md"
+
+# 🧬 A DOI ŐRYEKETŐJEL a koncept DOI, amit a Zenodo ad a kiadáskor. Amíg nincs,
+# a pontos DOI-értéket a CITATION.cff és a README birtokolja; a PyPI-csomag
+# adatlapján a DOI megjelenése önmagában nem engedély, hanem a Zenodo
+# kiadás utáni admin-lépés.
+
+[project.scripts]
+# Module-level entry point. `python/tkr_ibm.py` has `main(argv=None) -> int`,
+# so returning the int from main() is what makes the shell exit code correct.
+tkr-qpu = "python.tkr_ibm:main"
+
+[tool.setuptools.packages.find]
+# `python/` and `proofs/` are PEP 420 implicit namespace packages: they
+# deliberately have NO `__init__.py`.
+#
+# WHY NO __init__.py:
+#   * a top-level package literally named `python` is a landmine on PyPI — it
+#     shadows nothing in the stdlib, but it collides with every other
+#     distribution that ships a `python/` directory and makes import resolution
+#     depend on sys.path order;
+#   * the repo is run as `python -m python.tkr_ibm` and `python -m proofs.tkr_proofs`
+#     from the project root, and the internal imports
+#     (`from python.tkr_measure import ...`) already rely on namespace resolution;
+#   * namespace packages can be extended by more than one distribution, so they
+#     merge instead of shadowing each other.
+#
+# WHY `namespaces = true` IS REQUIRED HERE (measured with setuptools 81.0.0):
+#   * `namespaces = false` uses the classic finder, which only accepts
+#     directories containing `__init__.py`. With this layout it finds NOTHING
+#     (find_packages() -> []) and the wheel would be empty;
+#   * `namespaces = true` uses the PEP 420 finder, which returns exactly
+#     ['proofs', 'python'] — both trees are picked up, `docs/`, `config/` and
+#     `rust/` are not.
+#
+# WHY `include` IS NARROWED:
+#   * the repository root also holds `docs/`, `config/`, `rust/` and build
+#     output. Only the two Python trees may be installed; including the rest
+#     would ship a top-level `rust/` or `config/` package into site-packages.
+where = ["."]
+include = ["python*", "proofs*"]
+namespaces = true
+
+[tool.tkr]
+# Minimal machine-readable metadata for the project's own tooling. Kept
+# separate from `[project]` so it never leaks into the published distribution
+# metadata (unknown top-level tables are not forwarded by the PEP 621 backend).
+crate = "tkr-quantum"       # must stay in sync with rust/Cargo.toml [package].name
+hardware_validated = true
+reference_backend = "IBM Quantum"
+reference_device = "ibm_marrakesh"   # 156-qubit superconducting QPU
+reference_shots = 2000

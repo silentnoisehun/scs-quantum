@@ -1,0 +1,48 @@
+# Citation metadata for TKR.
+#
+# ⚠️ BEFORE PUBLISHING — two things here must be decided by a human, not by
+# the tooling:
+#
+# 1. The AUTHOR LIST. The entry below is deliberately a collective, not invented
+#    individuals. Replace "TKR contributors" with real people ONLY when they have
+#    agreed to be named on a DOI. A Zenodo DOI is permanent and public, and it
+#    cannot be quietly reassigned later — being named on it is a public, citable
+#    attribution. See RELEASE.md §0.
+#
+# 2. THE DOI. Zenodo mints it on the first upload. Put the CONCEPT DOI here (the
+#    one covering all versions), not the version DOI: the concept DOI always
+#    resolves to the latest release. See RELEASE.md §4.5 for the distinction.
+#
+# The repository URL below is the intended public location. Confirm it resolves
+# before tagging a release — the sdist check and the Zenodo record depend on it.
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "TKR: A Frequency-Domain Wave-Packet Encoding System with a Hardware-Validated Quantum Bridge"
+abstract: >-
+  TKR (Térkódoló Rendszer, Spatial Encoding System) is a frequency-domain
+  wave-packet encoding system in which the carrier frequency carries the payload
+  and the phase carries context. This release adds a hardware-validated quantum
+  bridge: the encoding was measured on a real 156-qubit superconducting QPU (IBM
+  ibm_marrakesh, 2000 shots per run, 2026-10-06), reaching 99.3% Bell balance on
+  two qubits, 98.8% on a reproducibility run, and an ideal three-qubit GHZ
+  distribution. The decoding formulas' assumption P(q0=1)=sin^2(theta/2) is
+  therefore measurement-verified rather than assumed. The measurement layer, the
+  encoding primitives and the reference circuits are hardware-independent and
+  depend only on the Python standard library. Classical and hardware proofs are
+  reported as strictly separate evidence levels.
+type: software
+version: 0.2.0
+date-released: "2026-10-06"
+license: MIT
+authors:
+  - name: "TKR contributors"
+    alias: TKR contributors
+    website: "https://github.com/silentnoisehun/tkr-quantum"
+keywords:
+  - quantum computing
+  - quantum encoding
+  - wave packet
+  - frequency-domain encoding
+  - interference
+  - superconducting QPU
+repository-code: "https://github.com/silentnoisehun/tkr-quantum"

@@ -1,0 +1,118 @@
+# TKR — CI
+#
+# A cél: minden kiadáskor bizonyítani, hogy a KLASZIKUS réteg zöld, és hogy
+# a hardverfüggetlen mérési réteg importálható Qiskit nélkül.
+#
+# 🧬 A CI NEM futtat QPU-mérést. A `--local` mód ellenőrzi a mérési pipeline-t
+# IDEÁLIS szimulációban, ami a KÓD helyességét igazolja — a HARDVERről semmit
+# nem állít. A hardveres bizonyíték a `python -m python.tkr_ibm` valódi QPU-futtatás,
+# kézzel, a saját IBM tokenjükkel (lásd docs/TKR_WHITE_PAPER_v2.md §4).
+
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    name: Rust — cargo test --release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Run the test suite
+        working-directory: rust
+        run: cargo test --release --locked
+        # 🧬 A 36 teszt a KLASSZIKUS szoftver helyességét igazolja.
+        # Nem hardveres bizonyíték. A zöld eredmény NEM jelent QPU-mérést.
+
+      - name: Clippy (warnings as errors)
+        working-directory: rust
+        run: cargo clippy --release --all-targets -- -D warnings
+        continue-on-error: true
+
+  python-core:
+    name: Python — stdlib-only core + proofs
+    runs-on: ubuntu-latest
+    # Nincs pip install: a mérési réteg és a proofs a standard library-t
+    # használja KIZÁRÓLAG. Ez szerződés, nem véletlen (pyproject.toml).
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: The measurement layer must import WITHOUT qiskit
+        run: |
+          python -c "
+          from python.tkr_measure import (
+              WavePacket, CircuitSpec, Gate, Counts,
+              counts_to_keys, bit_order_selfcheck,
+              reference_circuits, resize_reference,
+          )
+          assert bit_order_selfcheck(verbose=False), 'bit-order self-check failed'
+          print('measurement layer imports with stdlib only: OK')
+          "
+
+      - name: Run the proof suite
+        run: python -m proofs.tkr_proofs
+
+  python-qpu-code:
+    name: Python — local ideal pipeline (NOT hardware evidence)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Qiskit
+        run: pip install --upgrade "qiskit>=2.0" "qiskit-ibm-runtime>=0.40"
+
+      - name: Reference circuits in IDEAL simulation
+        # ⚠️ Ez IDEÁLIS, helyi számítás. A kód pipeline-ját ellenőrzi
+        # (bit-sorrend, klasszikus regiszter, riport). A HARDVERről semmit nem állít.
+        run: python -m python.tkr_ibm bell --local --shots 2000
+
+      - name: GHZ reference in IDEAL simulation
+        run: python -m python.tkr_ibm ghz --local --shots 2000
+
+  secrets-scan:
+    name: No credential committed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assert no real .env is tracked
+        run: |
+          if git ls-files --error-unmatch .env 2>/dev/null; then
+            echo "::error::.env is tracked in git — a real credential may be exposed"
+            exit 1
+          fi
+          if git ls-files --error-unmatch config/.env 2>/dev/null; then
+            echo "::error::config/.env is tracked in git"
+            exit 1
+          fi
+          echo "no .env tracked: OK"
+
+      - name: Assert placeholder values only
+        run: |
+          # The template is safe to ship; make sure it holds placeholders.
+          if grep -qE 'IBM_QUANTUM_API_TOKEN=[A-Za-z0-9_-]{20,}' config/.env.template; then
+            echo "::error::config/.env.template appears to contain a real token"
+            exit 1
+          fi
+          echo "template holds placeholders only: OK"
