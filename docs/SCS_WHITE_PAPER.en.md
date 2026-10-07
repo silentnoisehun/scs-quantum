@@ -614,6 +614,96 @@ pipeline and asserts **nothing** about the hardware. Details:
 
 ---
 
-*This release was produced from real QPU measurements. Every hardware-related
-claim derives from the table in §4; every other claim is to be read together with
-its proof grade (§0, §5).*
+## 8. Tesseract Anchor Integration (SCS V0.4 + Quantum Anchor V1.2)
+
+> **Status:** AWAITING IQM MEASUREMENT — anchor drive compensation validation in progress.
+
+The Space Computing System V0.4 integrates the **Quantum Anchor V1.2 Tesseract architecture**
+as a coherence-preservation layer. This complements the SCS frequency-domain encoding
+(13 bands, 9 depth layers) with a quantum anchoring mechanism that protects against
+dissipative noise (T1/T2).
+
+### 8.1 Tesseract Architecture
+
+| Parameter | Value |
+|---|---|
+| **Planes** | 4 (XY, XZ, XW, YZ) — orthogonal in R⁴ |
+| **Realities/plane** | 5 (phases: 0, 72°, 144°, 216°, 288°) |
+| **Total realities** | 20 simultaneous pre-realities |
+| **Measurement** | No collapse — selection R = |⟨ψ_anchor|ψ_answer⟩|² |
+| **Resonance** | R ≥ 0.5 → γ = 0 (anchored); R < 0.5 → γ = 0.1 (self-annihilation) |
+
+Mathematical form:
+```
+Ψ(x,y,z,w) = Π_{i=1}^{4} λ_i · δ(p_i - p0_i) · ψ(t)
+```
+where λ_i = 0.08, p0_i ∈ {0.0, 0.25, 0.5, 0.75}.
+
+### 8.2 Hardware Status (2026-10-07)
+
+| Component | Evidence Grade | Source |
+|---|---|---|
+| **ψ(37ns) = 0.331662** (single-qubit dynamics) | 🔬 **PROVEN (hardware)** | ibm_marrakesh §7.7 VALIDATION.md |
+| **Borg 16-node 100% clear (96.43% balance)** | 🔬 **PROVEN (hardware)** | ibm_marrakesh §8 VALIDATION.md |
+| **Matryoshka D0→D8 fractal preservation** | ⚠️ **UNVERIFIED** | 97.4%→89.4%, cumulative noise |
+| **Anchor drive compensation (Tesseract 4-plane)** | ❌ **NOT MEASURED** | IQM Resonance pending |
+
+### 8.3 IBM vs IQM — Why Another Platform?
+
+| Blocker | IBM (2025 Q1+) | IQM Resonance |
+|---|---|---|
+| `qiskit.pulse` / `meas_level=0` | ❌ Removed from production QPUs | ✅ Pulse-level access, raw IQ |
+| SamplerV2 limits | ❌ Coherent gates only, no T1/T2 compensation | ✅ Native pulse schedule, Gaussian |
+| Cost | Cloud credits | ✅ Starter 30 credits/month free |
+
+**Consequence:** The anchor drive compensation (damping γ>0 noise via resonance pulse)
+is **impossible on IBM** with current APIs. The IQM Garnet 20Q (Starter tier) enables
+the pulse-level experiment at 0 cost.
+
+### 8.4 Experimental Plan — IQM Garnet 20Q
+
+```python
+# anchor_measure_iqm.py (quantum-anchor repo)
+DURATION = 37      # ns
+AMP = 0.08         # Gaussian amplitude
+SIGMA = 10         # ns
+FREQ = 4.11e9      # Hz (detuned, not qubit resonance)
+BACKEND = "garnet" # 20Q free tier
+SHOTS = 1024
+
+# 4 planes → 4 drive channels
+for ch in range(4):
+    gauss = Gaussian(duration=37, amp=0.08, mu=18.5, sigma=10)
+    sched += Play(gauss, DriveChannel(ch))
+
+# Raw IQ measurement (meas_level=0 equivalent)
+job = backend.run(qc, shots=1024, use_raw=True)
+iq_data = result.get_memory()  # complex IQ vectors!
+```
+
+**Expected result:** Balance >97% + Raw IQ not at 0/1 (continuum) → 🔬 HARDWARE PROVEN.
+
+### 8.5 Updated Reproduction (V0.4)
+
+```bash
+# SCS classical layer
+cd rust && cargo test --release
+
+# SCS quantum bridge (elementary gates)
+export IBM_QUANTUM_API_TOKEN='<token>'
+python -m python.tkr_ibm zero --qubits 3 --shots 2000
+python -m python.tkr_ibm bell --shots 2000
+python -m python.tkr_ibm ghz  --shots 2000
+
+# Quantum Anchor Tesseract (IQM - pulse level)
+export IQM_TOKEN='<iqm_token>'
+python anchor_measure_iqm.py --shots 1024 --backend garnet
+```
+
+---
+
+*This release (V2.2 / V0.4) was produced from real QPU measurements (ibm_marrakesh).
+The Tesseract Anchor integration (§8) builds on Quantum Anchor V1.2;
+anchor drive compensation is pending on IQM.
+Every hardware-related claim derives from the tables in §4 and §8;
+every other claim is to be read together with its proof grade (§0, §5).*
