@@ -1,0 +1,47 @@
+{
+  "title": "SCS-Quantum V0.4 — Frequency-Domain Wave-Packet Encoding with Tesseract Anchor",
+  "description": "SCS-Quantum is a frequency-domain quantum encoding framework using 13 bands and wave-packet dynamics. V0.4 integrates the Tesseract Anchor (Quantum Anchor V1.2) as the coherence preservation layer: 4 orthogonal planes × 5 phase realities = 20 simultaneous pre-realities with self-annihilation via destructive interference. Evidence: ψ(37ns)=0.331662 (γ=0 model) on ibm_marrakesh 156Q Heron r2, Borg 16-node 100% clear (96.43% balance). Hardware-proven: 🔬 single-qubit dynamics and fractional-gate protocols. Zenodo concept DOI for citation stability.",
+  "keywords": [
+    "quantum computing",
+    "frequency-domain encoding",
+    "wave-packet dynamics",
+    "quantum anchor",
+    "Tesseract anchor",
+    "fractional gates",
+    "qiskit-dynamics",
+    "Heron processor",
+    "superconducting QPU",
+    "Borg Cube",
+    "predictive computing",
+    "coherence preservation",
+    "destructive interference"
+  ],
+  "license": "MIT",
+  "version": "0.4.0",
+  "publication_date": "2026-10-07",
+  "creators": [
+    {
+      "name": "Máté Róbert",
+      "affiliation": "Independent",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "access_right": "open",
+  "upload_type": "software",
+  "related_identifiers": [
+    {
+      "relation": "isSupplementedBy",
+      "identifier": "https://github.com/silentnoisehun/quantum-anchor",
+      "resource_type": "software"
+    },
+    {
+      "relation": "references",
+      "identifier": "https://doi.org/10.5281/zenodo.XXXXXXX",
+      "resource_type": "publication"
+    }
+  ],
+  "references": [
+    "VALIDATION.md §7.7–§7.8 hardware results on ibm_marrakesh",
+    "CITATION.cff for formal citation metadata"
+  ]
+}

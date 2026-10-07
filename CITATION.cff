@@ -16,31 +16,46 @@
 # before tagging a release — the sdist check and the Zenodo record depend on it.
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "SCS: A Frequency-Domain Wave-Packet Encoding System with a Hardware-Validated Quantum Bridge"
+title: "SCS-Quantum V0.4 — Frequency-Domain Wave-Packet Encoding with Tesseract Anchor"
 abstract: >-
-  SCS (Space Computing System) is a frequency-domain wave-packet encoding
-  system in which the carrier frequency carries the payload and the phase carries
-  context. This release adds a hardware-validated quantum bridge: the encoding was measured on a real 156-qubit superconducting QPU (IBM
-  ibm_marrakesh, 2000 shots per run, 2026-10-06), reaching 99.3% Bell balance on
-  two qubits, 98.8% on a reproducibility run, and an ideal three-qubit GHZ
-  distribution. The decoding formulas' assumption P(q0=1)=sin^2(theta/2) is
-  therefore measurement-verified rather than assumed. The measurement layer, the
-  encoding primitives and the reference circuits are hardware-independent and
-  depend only on the Python standard library. Classical and hardware proofs are
-  reported as strictly separate evidence levels.
+  SCS-Quantum is a frequency-domain wave-packet encoding framework using 13 bands
+  and wave-packet dynamics. V0.4 integrates the Tesseract Anchor (Quantum Anchor V1.2)
+  as the coherence preservation layer: 4 orthogonal planes × 5 phase realities = 20
+  simultaneous pre-realities with self-annihilation via destructive interference.
+  Evidence: ψ(37ns)=0.331662 (γ=0 model) on ibm_marrakesh 156Q Heron r2,
+  Borg 16-node 100% clear (96.43% balance).
+  Hardware-proven: 🔬 single-qubit dynamics and fractional-gate protocols.
 type: software
-version: 0.3.0
-date-released: "2026-10-06"
+version: 0.4.0
+date-released: "2026-10-07"
 license: MIT
 authors:
   - name: "Máté Róbert"
-    alias: Máté Róbert
+    alias: "silentnoisehun"
     website: "https://github.com/silentnoisehun"
+    orcid: "0000-0000-0000-0000"
 keywords:
   - quantum computing
-  - quantum encoding
-  - wave packet
   - frequency-domain encoding
-  - interference
+  - wave-packet dynamics
+  - quantum anchor
+  - Tesseract anchor
+  - fractional gates
+  - qiskit-dynamics
+  - Heron processor
   - superconducting QPU
+  - Borg Cube
+  - predictive computing
+  - coherence preservation
+  - destructive interference
 repository-code: "https://github.com/silentnoisehun/scs-quantum"
+references:
+  - type: software
+    title: "Quantum Anchor V1.2 — Tesseract Anchor"
+    url: "https://github.com/silentnoisehun/quantum-anchor"
+    version: "1.2.0"
+  - type: article
+    title: "Hope-WP-2026 V1.2 — Quantum Anchor White Paper"
+    authors:
+      - name: "Máté Róbert"
+    year: 2026
