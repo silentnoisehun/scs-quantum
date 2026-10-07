@@ -632,6 +632,95 @@ python -m python.tkr_ibm ghz  --shots 2000
 
 ---
 
+## 14. Tesseract Anchor Integráció (SCS V0.4 + Quantum Anchor V1.2)
+
+> **Státusz:** VÁRAKOZÁS IQM MÉRÉSRE — az anchor drive kompenzáció validációja folyamatban.
+
+Az SCS V0.4 beépíti a **Quantum Anchor V1.2 Tesseract architektúráját** mint
+koherencia-megőrző réteget. Ez a `python/tkr_ibm.py` IBM-alapú kvantumhídját
+kiegészíti egy pulse-level horgony-mechanizmussal.
+
+### 14.1 Tesseract Architektúra
+
+| Paraméter | Érték |
+|---|---|
+| **Síkok** | 4 (XY, XZ, XW, YZ) — ortogonális R⁴-ben |
+| **Valóság/sík** | 5 (fázis: 0, 72°, 144°, 216°, 288°) |
+| **Összes valóság** | 20 szimultán elő-valóság |
+| **Mérés** | Nincs collapse — szelekció R = |⟨ψ_anchor|ψ_answer⟩|² |
+| **Rezonancia** | R ≥ 0.5 → γ = 0 (horgonyozva); R < 0.5 → γ = 0.1 (elhalás) |
+
+Matematikai forma:
+```
+Ψ(x,y,z,w) = Π_{i=1}^{4} λ_i · δ(p_i - p0_i) · ψ(t)
+```
+ahol λ_i = 0.08, p0_i ∈ {0.0, 0.25, 0.5, 0.75}.
+
+### 14.2 Hardveres Státusz (2026-10-07)
+
+| Komponens | Bizonyítéki szint | Forrás |
+|---|---|---|
+| **ψ(37ns) = 0.331662** (egykvantumos dinamika) | 🔬 **BIZONYÍTVA (hardveres)** | ibm_marrakesh VALIDATION.md §7.7 |
+| **Borg 16-node 100% clear (96.43% balance)** | 🔬 **BIZONYÍTVA (hardveres)** | ibm_marrakesh VALIDATION.md §8 |
+| **Matryoshka D0→D8 fraktális megőrzés** | ⚠️ **ELLENŐRIZETLEN** | 97.4%→89.4%, kumulatív zaj |
+| **Anchor drive kompenzáció (Tesseract 4-sík)** | ❌ **NEM MÉRVE** | IQM Resonance pending |
+
+### 14.3 IBM vs IQM — Miért kell másik platform?
+
+| Blokkoló | IBM (2025 Q1+) | IQM Resonance |
+|---|---|---|
+| `qiskit.pulse` / `meas_level=0` | ❌ Eltávolítva production QPU-król | ✅ Pulse-level access, raw IQ |
+| SamplerV2 korlátok | ❌ Csak koherens kapuk, nincs T1/T2 kompenzáció | ✅ Natív pulse schedule, Gaussian |
+| Költség | Cloud credits | ✅ Starter 30 kredit/hó ingyen |
+
+**Következmény:** Az anchor drive kompenzáció (a γ>0 zaj csillapítása rezonancia-impulzussal)
+**IBM-en lehetetlen** a jelenlegi API-kkal. Az IQM Garnet 20Q (Starter tier) lehetővé teszi
+a pulse-level kísérletet 0 Ft-ból.
+
+### 14.4 Kísérleti Terv — IQM Garnet 20Q
+
+```python
+# anchor_measure_iqm.py (quantum-anchor repo)
+DURATION = 37      # ns
+AMP = 0.08         # Gaussian amplitude
+SIGMA = 10         # ns
+FREQ = 4.11e9      # Hz (detuned, nem qubit rezonancia)
+BACKEND = "garnet" # 20Q free tier
+SHOTS = 1024
+
+# 4 sík → 4 drive channel
+for ch in range(4):
+    gauss = Gaussian(duration=37, amp=0.08, mu=18.5, sigma=10)
+    sched += Play(gauss, DriveChannel(ch))
+
+# Raw IQ mérés (meas_level=0 ekvivalens)
+job = backend.run(qc, shots=1024, use_raw=True)
+iq_data = result.get_memory()  # komplex IQ vektorok!
+```
+
+**Várt eredmény:** Balance >97% + Raw IQ nem 0/1-en (kontinuum) → 🔬 HARDWARE PROVEN.
+
+### 14.5 Frissített Futtatási Útmutató (V0.4)
+
+```powershell
+# SCS klasszikus réteg
+cd rust; cargo test --release
+
+# SCS kvantumhíd (alapkapuk)
+$env:IBM_QUANTUM_API_TOKEN = '<token>'
+python -m python.tkr_ibm zero --qubits 3 --shots 2000
+python -m python.tkr_ibm h    --shots 2000
+python -m python.tkr_ibm bell --shots 2000
+python -m python.tkr_ibm ghz  --shots 2000
+
+# Quantum Anchor Tesseract (IQM - pulse level)
+$env:IQM_TOKEN = '<iqm_token>'
+python anchor_measure_iqm.py --shots 1024 --backend garnet
+```
+
+---
+
 *Minden hardverre vonatkozó állítás forrása a `python -m python.tkr_ibm`
-mérése. A zöld tesztek a klasszikus szoftver helyességét bizonyítják, nem a
-hardverét — ez a két bizonyíték nem cserélhető fel.*
+mérése (IBM) illetve `anchor_measure_iqm.py` (IQM). A zöld tesztek a
+klasszikus szoftver helyességét bizonyítják, nem a hardverét — ez a két
+bizonyíték nem cserélhető fel.*

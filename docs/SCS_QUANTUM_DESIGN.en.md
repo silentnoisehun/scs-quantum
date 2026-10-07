@@ -630,7 +630,95 @@ python -m python.tkr_ibm ghz  --shots 2000
 
 ---
 
+## 14. Tesseract Anchor Integration (SCS V0.4 + Quantum Anchor V1.2)
+
+> **Status:** AWAITING IQM MEASUREMENT — anchor drive compensation validation in progress.
+
+SCS V0.4 integrates the **Quantum Anchor V1.2 Tesseract architecture** as a
+coherence-preservation layer. This complements the `python/tkr_ibm.py` IBM-based
+quantum bridge with a pulse-level anchoring mechanism.
+
+### 14.1 Tesseract Architecture
+
+| Parameter | Value |
+|---|---|
+| **Planes** | 4 (XY, XZ, XW, YZ) — orthogonal in R⁴ |
+| **Realities/plane** | 5 (phases: 0, 72°, 144°, 216°, 288°) |
+| **Total realities** | 20 simultaneous pre-realities |
+| **Measurement** | No collapse — selection R = |⟨ψ_anchor|ψ_answer⟩|² |
+| **Resonance** | R ≥ 0.5 → γ = 0 (anchored); R < 0.5 → γ = 0.1 (self-annihilation) |
+
+Mathematical form:
+```
+Ψ(x,y,z,w) = Π_{i=1}^{4} λ_i · δ(p_i - p0_i) · ψ(t)
+```
+where λ_i = 0.08, p0_i ∈ {0.0, 0.25, 0.5, 0.75}.
+
+### 14.2 Hardware Status (2026-10-07)
+
+| Component | Evidence Grade | Source |
+|---|---|---|
+| **ψ(37ns) = 0.331662** (single-qubit dynamics) | 🔬 **PROVEN (hardware)** | ibm_marrakesh VALIDATION.md §7.7 |
+| **Borg 16-node 100% clear (96.43% balance)** | 🔬 **PROVEN (hardware)** | ibm_marrakesh VALIDATION.md §8 |
+| **Matryoshka D0→D8 fractal preservation** | ⚠️ **UNVERIFIED** | 97.4%→89.4%, cumulative noise |
+| **Anchor drive compensation (Tesseract 4-plane)** | ❌ **NOT MEASURED** | IQM Resonance pending |
+
+### 14.3 IBM vs IQM — Why Another Platform?
+
+| Blocker | IBM (2025 Q1+) | IQM Resonance |
+|---|---|---|
+| `qiskit.pulse` / `meas_level=0` | ❌ Removed from production QPUs | ✅ Pulse-level access, raw IQ |
+| SamplerV2 limits | ❌ Coherent gates only, no T1/T2 compensation | ✅ Native pulse schedule, Gaussian |
+| Cost | Cloud credits | ✅ Starter 30 credits/month free |
+
+**Consequence:** The anchor drive compensation (damping γ>0 noise via resonance pulse)
+is **impossible on IBM** with current APIs. The IQM Garnet 20Q (Starter tier) enables
+the pulse-level experiment at 0 cost.
+
+### 14.4 Experimental Plan — IQM Garnet 20Q
+
+```python
+# anchor_measure_iqm.py (quantum-anchor repo)
+DURATION = 37      # ns
+AMP = 0.08         # Gaussian amplitude
+SIGMA = 10         # ns
+FREQ = 4.11e9      # Hz (detuned, not qubit resonance)
+BACKEND = "garnet" # 20Q free tier
+SHOTS = 1024
+
+# 4 planes → 4 drive channels
+for ch in range(4):
+    gauss = Gaussian(duration=37, amp=0.08, mu=18.5, sigma=10)
+    sched += Play(gauss, DriveChannel(ch))
+
+# Raw IQ measurement (meas_level=0 equivalent)
+job = backend.run(qc, shots=1024, use_raw=True)
+iq_data = result.get_memory()  # complex IQ vectors!
+```
+
+**Expected result:** Balance >97% + Raw IQ not at 0/1 (continuum) → 🔬 HARDWARE PROVEN.
+
+### 14.5 Updated Reproduction Guide (V0.4)
+
+```bash
+# SCS classical layer
+cd rust && cargo test --release
+
+# SCS quantum bridge (elementary gates)
+export IBM_QUANTUM_API_TOKEN='<token>'
+python -m python.tkr_ibm zero --qubits 3 --shots 2000
+python -m python.tkr_ibm h    --shots 2000
+python -m python.tkr_ibm bell --shots 2000
+python -m python.tkr_ibm ghz  --shots 2000
+
+# Quantum Anchor Tesseract (IQM - pulse level)
+export IQM_TOKEN='<iqm_token>'
+python anchor_measure_iqm.py --shots 1024 --backend garnet
+```
+
+---
+
 *The source of every hardware-related claim is the measurement performed by
-`python -m python.tkr_ibm`. The green tests establish the correctness of the
-classical software, not of the hardware — these two kinds of proof are not
-interchangeable.*
+`python -m python.tkr_ibm` (IBM) and `anchor_measure_iqm.py` (IQM). The green
+tests establish the correctness of the classical software, not of the hardware
+— these two kinds of proof are not interchangeable.*
