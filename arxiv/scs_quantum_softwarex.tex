@@ -5,6 +5,7 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{hyperref}
+\usepackage{cite}
 \usepackage{geometry}
 \geometry{margin=2.5cm}
 
@@ -21,25 +22,25 @@
 \maketitle
 
 \begin{abstract}
-As cloud quantum computing tools become increasingly dependent on deep Python dependency graphs, verifying fundamental hardware executions without heavy runtime overhead has become challenging. We introduce \texttt{SCS-Quantum}, an open-source, dual-layer verification engine designed for high-reproducibility experiments on superconducting quantum processors. Built with a zero-dependency Python core and an accompanying high-performance Rust implementation, \texttt{SCS-Quantum} encodes frequency-domain wave packet parameters $(A, f, \phi)$ into transmon registers and executes direct hardware validation via IBM Quantum primitives. We report validation benchmarks across 7 independent hardware runs ($>14{,}000$ execution shots) on the 156-qubit IBM Heron processor (\texttt{ibm\_marrakesh}), demonstrating consistent Bell-state balance between $87.7\%$ and $99.3\%$ (median $94.9\%$) alongside complete three-qubit GHZ state synthesis. The package provides native AST dependency audits, rigorous evidence-level separation, and deterministic offline simulation testbeds, providing an accessible baseline for quantum software verification.
+As cloud quantum computing tools become increasingly dependent on deep Python dependency graphs, verifying fundamental hardware executions without heavy runtime overhead has become challenging. We introduce \texttt{SCS-Quantum}, an open-source, dual-layer verification engine designed for high-reproducibility experiments on superconducting quantum processors. Built with a zero-dependency Python core and an accompanying high-performance Rust implementation, \texttt{SCS-Quantum} encodes frequency-domain wave packet parameters $(A, f, \phi)$ into transmon registers and executes direct hardware validation via IBM Quantum primitives~\cite{cross2018qiskit,heron2024}. We report validation benchmarks across 7 independent hardware runs ($>14{,}000$ execution shots) on the 156-qubit IBM Heron processor (\texttt{ibm\_marrakesh})~\cite{heron2024,blais_cqed}, demonstrating consistent Bell-state balance between $87.7\%$ and $99.3\%$ (median $94.9\%$) alongside complete three-qubit GHZ state synthesis. The package provides native AST dependency audits, rigorous evidence-level separation, and deterministic offline simulation testbeds, providing an accessible baseline for quantum software verification.
 \end{abstract}
 
 \section{Motivation and Significance}
-Cloud-hosted quantum experimental frameworks typically mandate extensive software environments with dozens of transitive dependencies. This introduces dependency rot, non-deterministic package resolution, and barriers to long-term reproducibility. 
+Cloud-hosted quantum experimental frameworks typically mandate extensive software environments with dozens of transitive dependencies~\cite{cross2018qiskit,cirq2021,bergholm2018pennylane}. This introduces dependency rot, non-deterministic package resolution, and barriers to long-term reproducibility. 
 
-\texttt{SCS-Quantum} resolves these challenges by decoupling the mathematical state encoding and verification logic from provider-specific SDK bindings. The core encoding and decoding logic is implemented with zero third-party dependencies in standard Python (audited via abstract syntax tree inspection) alongside a high-performance native Rust crate.
+\texttt{SCS-Quantum} resolves these challenges by decoupling the mathematical state encoding and verification logic from provider-specific SDK bindings. The core encoding and decoding logic is implemented with zero third-party dependencies in standard Python (audited via abstract syntax tree inspection) alongside a high-performance native Rust crate~\cite{matsakis2014rust}.
 
 \section{Software Architecture and Functionalities}
 The repository is structured into modular verification tiers:
 \begin{enumerate}
-  \item \textbf{Core Mathematical Encoding:} Parameterizes a continuous wave-packet $\psi(t) = A \exp(-\gamma t) \cos(2\pi f t + \phi)$ into parameterized single-qubit rotations ($R_Y, R_Z$) and entangling CNOT sequences.
+  \item \textbf{Core Mathematical Encoding:} Parameterizes a continuous wave-packet $\psi(t) = A \exp(-\gamma t) \cos(2\pi f t + \phi)$ into parameterized single-qubit rotations ($R_Y, R_Z$) and entangling CNOT sequences~\cite{nielsen_chuang,krantz_guide}.
   \item \textbf{Dual Language Equivalence:} Features a native Rust library implementing the same state parameterization, verified against the Python implementation via automated unit tests.
-  \item \textbf{Lightweight QPU Interface (\texttt{tkr\_ibm}):} Provides a streamlined, self-contained driver interfacing directly with IBM Runtime \texttt{SamplerV2}, abstracting transpilation and shot-retrieval into declarative CLI commands.
+  \item \textbf{Lightweight QPU Interface (\texttt{tkr\_ibm}):} Provides a streamlined, self-contained driver interfacing directly with IBM Runtime \texttt{SamplerV2}~\cite{cross2018qiskit,heron2024}, abstracting transpilation and shot-retrieval into declarative CLI commands.
   \item \textbf{Built-in Self-Testing & AST Audits:} Enforces a strict static inspection rule verifying that offline verification scripts contain zero external package imports.
 \end{enumerate}
 
 \section{Illustrative Hardware Benchmarks}
-\texttt{SCS-Quantum} was empirically evaluated on the 156-qubit IBM Heron r2 processor (\texttt{ibm\_marrakesh}) across 7 independent hardware executions (2000 to 4000 shots per run):
+\texttt{SCS-Quantum} was empirically evaluated on the 156-qubit IBM Heron r2 processor (\texttt{ibm\_marrakesh})~\cite{heron2024,blais_cqed} across 7 independent hardware executions (2000 to 4000 shots per run):
 
 \begin{table}[htbp]
 \centering
@@ -64,5 +65,48 @@ The system successfully recovered Bell correlations across all runs with a media
 
 \section{Impact and Reproducibility}
 \texttt{SCS-Quantum} is distributed under the MIT license with complete documentation, offline self-tests, and persistent Zenodo DOIs: \url{https://github.com/silentnoisehun/scs-quantum}.
+
+
+\begin{thebibliography}{99}
+\bibitem{cross2018qiskit}
+A.~Cross,
+``The IBM Q experience and Qiskit open-source quantum computing software,''
+\emph{APS March Meeting Abstracts}, vol.~2018, pp.~L58--003, 2018.
+
+\bibitem{cirq2021}
+Cirq Developers,
+``Cirq: A Python framework for creating, editing, and invoking Noisy Intermediate Scale Quantum (NISQ) circuits,''
+Zenodo, 2021.
+
+\bibitem{bergholm2018pennylane}
+V.~Bergholm et~al.,
+``PennyLane: Automatic differentiation of hybrid quantum-classical computations,''
+\emph{arXiv preprint arXiv:1811.04968}, 2018.
+
+\bibitem{matsakis2014rust}
+N.~D.~Matsakis and F.~S.~Klock,
+``The Rust language,''
+\emph{ACM SIGAda Ada Letters}, vol.~34, no.~3, pp.~103--104, 2014.
+
+\bibitem{krantz_guide}
+P.~Krantz, M.~Kjaergaard, F.~Yan, T.~P.~Orlando, S.~Gustavsson, and W.~D.~Oliver,
+``A quantum engineer's guide to superconducting qubits,''
+\emph{Applied Physics Reviews}, vol.~6, no.~2, p.~021318, 2019.
+
+\bibitem{blais_cqed}
+A.~Blais, A.~L.~Grimsmo, S.~M.~Girvin, and A.~Wallraff,
+``Circuit quantum electrodynamics,''
+\emph{Reviews of Modern Physics}, vol.~93, no.~2, p.~025005, 2021.
+
+\bibitem{heron2024}
+IBM Quantum,
+``IBM Quantum Heron processor architecture and calibration specifications,''
+IBM Technical Whitepaper, 2024.
+
+\bibitem{nielsen_chuang}
+M.~A.~Nielsen and I.~L.~Chuang,
+\emph{Quantum Computation and Quantum Information},
+Cambridge University Press, 2010.
+\end{thebibliography}
 
 \end{document}
