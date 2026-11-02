@@ -1,5 +1,8 @@
 # SCS — Space Computing System
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23890912.svg)](https://doi.org/10.5281/zenodo.23890912)
+[![ORCID](https://img.shields.io/badge/ORCID-0009--0003--3986--6039-green.svg)](https://orcid.org/0009-0003-3986-6039)
+
 Frekvencialapú hullámcsomag-kódolás, **valódi kvantumhardveren igazolt** kvantumhíddal.
 
 > 🧬 **A rendszer 2 és 3 qubites kvantumhídja hardveresen bizonyított.**
