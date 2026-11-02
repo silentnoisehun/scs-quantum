@@ -1,6 +1,6 @@
 {
-  "title": "SCS-Quantum: Frequency-Domain Wave-Packet Encoding with Hardware-Validated Quantum Bridge",
-  "description": "SCS-Quantum is a frequency-domain quantum encoding framework using 13 bands and wave-packet dynamics. Validated on IBM Heron r2 superconducting quantum processor (ibm_marrakesh) with Bell balance 99.3% and ideal GHZ states.",
+  "title": "SCS-Quantum: A Lightweight, Zero-Dependency Verification and Measurement Engine for Superconducting Transmon Circuits",
+  "description": "SCS-Quantum is an open-source, dual-layer (pure Python standard library and high-performance Rust) verification engine for transmon quantum processors. Features hardware benchmarks across 7 independent runs on the 156-qubit IBM Heron processor (ibm_marrakesh), measuring empirical Bell-state balance (median 94.9%, range 87.7%-99.3%) and multi-qubit GHZ state distributions.",
   "keywords": [
     "quantum computing",
     "frequency-domain encoding",
@@ -21,8 +21,8 @@
   "publication_date": "2026-11-02",
   "creators": [
     {
-      "name": "Rongyász, Máté",
-      "affiliation": "Silent Coder Labs",
+      "name": "Róbert, Máté",
+      "affiliation": "Independent Quantum Researcher, Silent Coder Lab",
       "orcid": "0009-0003-3986-6039"
     }
   ],
