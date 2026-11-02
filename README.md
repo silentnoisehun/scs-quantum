@@ -1,6 +1,12 @@
-# SCS — Space Computing System
+# SCS — Space Computing System: Zero-Dependency Quantum Engine
 
-Frekvencialapú hullámcsomag-kódolás, **valódi kvantumhardveren igazolt** kvantumhíddal.
+> ### 📄 Software Paper Manuscript Available
+> - **LaTeX Manuscript:** [rxiv/scs_quantum_softwarex.tex](arxiv/scs_quantum_softwarex.tex)
+> - **Title:** *SCS-Quantum: A Lightweight, Zero-Dependency Verification and Measurement Engine for Superconducting Transmon Circuits*
+> - **Target Venue:** *SoftwareX* / *Journal of Open Research Software (JORS)*
+> - **Hardware Benchmarks:** 7 independent runs on 156-qubit IBM Heron (ibm_marrakesh), 87.7%–99.3% Bell state balance (median 94.9%).
+
+
 
 > 🧬 **A rendszer 2 és 3 qubites kvantumhídja hardveresen bizonyított.**
 > Valódi 156 qubites szupravezető QPU-n mérve: a Bell-állapot egyensúlya
