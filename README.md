@@ -7,6 +7,13 @@
 > - **Hardware Benchmarks:** 7 independent runs on 156-qubit IBM Heron (ibm_marrakesh), 87.7%–99.3% Bell state balance (median 94.9%).
 
 
+<<<<<<< HEAD
+=======
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23890912.svg)](https://doi.org/10.5281/zenodo.23890912)
+[![ORCID](https://img.shields.io/badge/ORCID-0009--0003--3986--6039-green.svg)](https://orcid.org/0009-0003-3986-6039)
+
+Frekvencialapú hullámcsomag-kódolás, **valódi kvantumhardveren igazolt** kvantumhíddal.
+>>>>>>> c9bc9b5772f38df8252bc669ad9567c5d21fe1d4
 
 > 🧬 **A rendszer 2 és 3 qubites kvantumhídja hardveresen bizonyított.**
 > Valódi 156 qubites szupravezető QPU-n mérve: a Bell-állapot egyensúlya

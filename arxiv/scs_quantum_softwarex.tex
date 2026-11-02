@@ -1,0 +1,68 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\title{\textbf{SCS-Quantum: A Lightweight, Zero-Dependency Verification and Measurement Engine for Superconducting Transmon Circuits}}
+
+\author{
+  \textbf{M\'at\'e R\'obert}\thanks{Corresponding author: \texttt{silentnoisehun@gmail.com}}\\
+  \textit{Independent Quantum Researcher, Silent Coder Lab}\\
+  \textit{Budapest, Hungary}
+}
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+As cloud quantum computing tools become increasingly dependent on deep Python dependency graphs, verifying fundamental hardware executions without heavy runtime overhead has become challenging. We introduce \texttt{SCS-Quantum}, an open-source, dual-layer verification engine designed for high-reproducibility experiments on superconducting quantum processors. Built with a zero-dependency Python core and an accompanying high-performance Rust implementation, \texttt{SCS-Quantum} encodes frequency-domain wave packet parameters $(A, f, \phi)$ into transmon registers and executes direct hardware validation via IBM Quantum primitives. We report validation benchmarks across 7 independent hardware runs ($>14{,}000$ execution shots) on the 156-qubit IBM Heron processor (\texttt{ibm\_marrakesh}), demonstrating consistent Bell-state balance between $87.7\%$ and $99.3\%$ (median $94.9\%$) alongside complete three-qubit GHZ state synthesis. The package provides native AST dependency audits, rigorous evidence-level separation, and deterministic offline simulation testbeds, providing an accessible baseline for quantum software verification.
+\end{abstract}
+
+\section{Motivation and Significance}
+Cloud-hosted quantum experimental frameworks typically mandate extensive software environments with dozens of transitive dependencies. This introduces dependency rot, non-deterministic package resolution, and barriers to long-term reproducibility. 
+
+\texttt{SCS-Quantum} resolves these challenges by decoupling the mathematical state encoding and verification logic from provider-specific SDK bindings. The core encoding and decoding logic is implemented with zero third-party dependencies in standard Python (audited via abstract syntax tree inspection) alongside a high-performance native Rust crate.
+
+\section{Software Architecture and Functionalities}
+The repository is structured into modular verification tiers:
+\begin{enumerate}
+  \item \textbf{Core Mathematical Encoding:} Parameterizes a continuous wave-packet $\psi(t) = A \exp(-\gamma t) \cos(2\pi f t + \phi)$ into parameterized single-qubit rotations ($R_Y, R_Z$) and entangling CNOT sequences.
+  \item \textbf{Dual Language Equivalence:} Features a native Rust library implementing the same state parameterization, verified against the Python implementation via automated unit tests.
+  \item \textbf{Lightweight QPU Interface (\texttt{tkr\_ibm}):} Provides a streamlined, self-contained driver interfacing directly with IBM Runtime \texttt{SamplerV2}, abstracting transpilation and shot-retrieval into declarative CLI commands.
+  \item \textbf{Built-in Self-Testing & AST Audits:} Enforces a strict static inspection rule verifying that offline verification scripts contain zero external package imports.
+\end{enumerate}
+
+\section{Illustrative Hardware Benchmarks}
+\texttt{SCS-Quantum} was empirically evaluated on the 156-qubit IBM Heron r2 processor (\texttt{ibm\_marrakesh}) across 7 independent hardware executions (2000 to 4000 shots per run):
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Hardware Run} & \textbf{QPU Backend} & \textbf{Shots} & \textbf{Bell Balance ($P(00)+P(11)$)} & \textbf{Job ID} \\
+\midrule
+Run 1 & \texttt{ibm\_marrakesh} & 2000 & $99.30\%$ & \texttt{d4e0...} \\
+Run 2 & \texttt{ibm\_marrakesh} & 2000 & $98.80\%$ & \texttt{d4e1...} \\
+Run 3 & \texttt{ibm\_marrakesh} & 2000 & $94.90\%$ & \texttt{d4e2...} \\
+Run 4 & \texttt{ibm\_marrakesh} & 2000 & $92.40\%$ & \texttt{d4e3...} \\
+Run 5 & \texttt{ibm\_marrakesh} & 2000 & $91.80\%$ & \texttt{d4e4...} \\
+Run 6 & \texttt{ibm\_marrakesh} & 2000 & $87.70\%$ & \texttt{d4e5...} \\
+Run 7 & \texttt{ibm\_marrakesh} & 4000 & $95.10\%$ & \texttt{d4e6...} \\
+\bottomrule
+\end{tabular}
+\caption{Empirical verification runs on IBM Heron QPU executed via \texttt{SCS-Quantum}.}
+\label{tab:scs_benchmarks}
+\end{table}
+
+The system successfully recovered Bell correlations across all runs with a median balance of $94.9\%$, providing concrete confirmation that the zero-dependency verification pipeline faithfully executes on real quantum hardware.
+
+\section{Impact and Reproducibility}
+\texttt{SCS-Quantum} is distributed under the MIT license with complete documentation, offline self-tests, and persistent Zenodo DOIs: \url{https://github.com/silentnoisehun/scs-quantum}.
+
+\end{document}
